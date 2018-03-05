@@ -12,6 +12,7 @@
 # This will allow you access to the SuperComputing Resources available to the
 # group. Currently, around 300,000 core hours/month.
 #     * When you have gotten the SUPR account apply to membership in all the projects: https://supr.snic.se/project/request/?search=wallner
+#     * When the membership is approved goto https://supr.snic.se/account/ and request accounts on all the resources. This is the account you will use to log in to the actual machine.
 #         
 # 2. Create a [github](http://github.com) account. Git is a version control system that enable you to keep track of changes to your code. No more: script.py, script_new.py, scrip_new2.py etc. Github is a cloud-based service that facilities the distribution and sharing of the code. The idea is that you should use git for your project, t
 # 
