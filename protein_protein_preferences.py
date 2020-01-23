@@ -19,7 +19,7 @@ def main():
     #except IndexError:
     #    print "ERROR: You must add a pdb list"
 
-    print ("trying to save github password!")
+    print ("didnt work, i will try again")
 
 
 if __name__ == '__main__':
