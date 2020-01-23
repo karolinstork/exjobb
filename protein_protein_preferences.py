@@ -19,7 +19,7 @@ def main():
     #except IndexError:
     #    print "ERROR: You must add a pdb list"
 
-    print ("git testar")
+    print ("git funkar!")
 
 
 if __name__ == '__main__':
