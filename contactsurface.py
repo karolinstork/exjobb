@@ -10,6 +10,7 @@ import pandas as pd
 import subprocess
 import string
 import itertools
+import glob
 
 
 import warnings
@@ -50,9 +51,22 @@ def count_models_chains(file):
 
     return numb_models_and_chains
 
+def create_path_renamed_chain(file_path, curr_chain_id, curr_model, new_chain_id):
+    pdbfile = os.path.basename(file_path)
+    filename_split = pdbfile.split('.')
+    path_chainfile = "files_for_naccess/"+filename_split[0]+curr_chain_id+str(curr_model)+"_"+new_chain_id+'.'+filename_split[1]
+
+    return path_chainfile
+
+def create_path_chain(file_path, chain_id, curr_model):
+    pdbfile = os.path.basename(file_path)
+    filename_split = pdbfile.split('.')
+    path_chainfile = "files_for_naccess/"+filename_split[0]+chain_id+str(curr_model)+'.'+filename_split[1]
+
+    return path_chainfile
+
 
 def rename_chains(file_path):
-
     print(file_path[-9:] + "-----------------------------------")
     file = open(file_path, 'r')
     s = pd.Series(file)
@@ -67,59 +81,108 @@ def rename_chains(file_path):
     model1_series=s[model1_start:model1_end]
 
     orig_chains = list(model1_series.str.get(21).unique())
-    new_chains=orig_chains
     numb_orig_chains = len(orig_chains)
-    stepsize=numb_orig_chains
 
-    print("number of models: ", number_of_models)
-    print("chains in model1 : ", orig_chains)
+    previous_chain = None
+    new_model = None
+    prev_model = None
+    new_chain_id= None
+    #stepsize=numb_orig_chains
+    open_files_dict={}
+    temp_dict={}
+
+    opened_files=[]
+
+    print("Number of models: ", number_of_models)
+    print("Chains in model 1: ", orig_chains)
 
     if number_of_models*numb_orig_chains>40:
         print("WARNING: Too many models and/or chains")
         return
 
-
-
     if number_of_models>1:
-        i=1
-        for i in range(1,len(models_start_end)):
-            model_numb=i+1
-            #print("MODEL", model_numb)
 
-            model_start = (models_start_end[i])[0]+1 #start of atom records
+        curr_model = 1
+        for line in model1_series: #model1 no need to change chain ids
+            chain_id = line[21]
+            path_chainfile = create_path_chain(file_path, chain_id, curr_model)
+
+            if not os.path.exists(path_chainfile) and not line.startswith("ANISOU"):
+                chain_file = open(path_chainfile, "w")
+                open_files_dict[chain_id] = chain_file
+                opened_files.append(chain_file)
+                print("Creating file "+ path_chainfile)
+
+            if line.startswith("ATOM") or line.startswith("HETATM"):
+                open_files_dict[chain_id].write(line)
+                #print(line.strip('\n'))
+
+        for file in opened_files:
+            file.close()
+
+
+        for i in range(1,len(models_start_end)): #rest of models, change chain ids
+            new_model = True
+            curr_model=i+1
+
+            print("Changing the chain id:s in MODEL", curr_model, ". . .")
+
+            model_start = (models_start_end[i])[0]+1 #CREATINGatom records
             model_end = (models_start_end[i])[1] #last row of atom (or hetatm) records
             model_series = s[model_start:model_end]
 
             for line in model_series: #renaming chains
                 curr_chain_id = line[21]
-
                 if curr_chain_id in orig_chains:
-                    print("I RECOGNIZE THIS ID! ", orig_chains)
-                    new_chain_id = next_available(curr_chain_id, orig_chains)
+                    if curr_chain_id in temp_dict:
+                        new_chain_id = temp_dict[curr_chain_id]
+                    else:
+                        new_chain_id = next_available(curr_chain_id, orig_chains)
+                        temp_dict[curr_chain_id] = new_chain_id
+                        orig_chains.append(new_chain_id)
+
                     line= line[:21]+ new_chain_id+line[22:]
+                    path_chainfile = create_path_renamed_chain(file_path, curr_chain_id, curr_model, new_chain_id)
+                    chain_id = new_chain_id
 
-                    pdbfile = os.path.basename(file_path)
-                    filename_split = pdbfile.split('.')
-                    path_chainfile = "files_for_naccess/"+filename_split[0]+new_chain_id+'.'+filename_split[1]
-
-                    if not os.path.exists(path_chainfile):
+                    if not os.path.exists(path_chainfile) and not line.startswith("ANISOU"):
                         chain_file = open(path_chainfile, "w")
-                        print("------------START OF FILE >1 models-----------")
+                        open_files_dict[chain_id] = chain_file
+                        opened_files.append(chain_file)
+                        print("Creating file "+path_chainfile)
 
-                    if line.startswith("ATOM"):# or line.startswith("HETATM"):
-                        chain_file.write(line)
+                    if line.startswith("ATOM") or line.startswith("HETATM"):
+                        chain_id = line[21]
+                        open_files_dict[chain_id].write(line)
                         #print(line.strip('\n'))
 
-                    if line.startswith("TER"):
+                    previous_chain = curr_chain_id
+                    new_model = False
 
-                        chain_file.close()
-                        print("-------------END OF FILE----------------")
+                else: #some files with multiple models already have unique chain ids
+                    chain_id=line[21]
+                    path_chainfile = create_path_chain(file_path, chain_id, curr_model)
+
+                    if not os.path.exists(path_chainfile) and not line.startswith("ANISOU"):
+                        chain_file = open(path_chainfile, "w")
+                        open_files_dict[chain_id] = chain_file
+                        opened_files.append(chain_file)
+                        print("Creating ~special~ file "+path_chainfile)
+
+                    if line.startswith("ATOM") or line.startswith("HETATM"):
+                        open_files_dict[chain_id].write(line)
+                        #print(line.strip('\n'))
 
 
+            temp_dict = {}
+            prev_model = curr_model
+            for file in opened_files:
+                file.close()
 
 
 
     if number_of_models<=1:  #no need to change chain ids
+        curr_model = 1
 
         atom_rows= s.index[s.str.startswith('ATOM')].tolist()
         first_atom_row = atom_rows[0]
@@ -129,182 +192,125 @@ def rename_chains(file_path):
 
         for line in model_series:
             chain_id = line[21]
-            pdbfile = os.path.basename(file_path)
-            filename_split = pdbfile.split('.')
-            path_chainfile = "files_for_naccess/"+filename_split[0]+chain_id+'.'+filename_split[1]
+            path_chainfile = create_path_chain(file_path, chain_id, curr_model)
 
-            if not os.path.exists(path_chainfile):
+            if not os.path.exists(path_chainfile) and not line.startswith("ANISOU"):
                 chain_file = open(path_chainfile, "w")
-                print("------------START OF FILE-----------")
+                open_files_dict[chain_id] = chain_file
+                opened_files.append(chain_file)
+                print("Creating file "+ path_chainfile)
 
-            if line.startswith("ATOM"):# or line.startswith("HETATM"):
-                chain_file.write(line)
-                #print(line.strip('\n'))
+            if line.startswith("ATOM") or line.startswith("HETATM"):
+                open_files_dict[chain_id].write(line)
+            #    print(line.strip('\n'))
 
-            if line.startswith("TER"):
-                chain_file.close()
-                print("------------END OF FILE-----------")
-
-
-
-        #    for chain in chains_in_one_model:
-        #        print("CHAIN "+ chain)
-        #        for line in model_i_series:
-        #            if line[21] == chain:
-        #                print(line.strip('\n'))
-
-        #chain_ids = slized_s.str.get(21)
-        #print(chain_ids)
-
-        #duplicates = slized_s.duplicated(keep='first')
-        #print(s.loc[duplicates])
-
-    #    for line in s:
-    #        curr_res = line[17:19]
-    #        if line.startswith("ATOM") or line.startswith("HETATM"):
-    #            if line[21] not in chain_ids:
-    #                orig_chains.append(line[21])
-    #            else:
-    #                temp_chains.append(i)
-    ##
-    #        prev_res = curr_res
-    ##            i=i+1
-
-
-            #if not (line.startswith("HETATM") and line[17:19]=="HOH"):
-        #    print(line.strip('\n'))
-
-            #else:
-                #continue
-
-
-            #renamed_chains_file.write(line)
-
-        #row_models= s.index[s.str.startswith('MODEL')].tolist()
-        #row_endmdls=s.index[s.str.startswith('ENDMDL')].tolist()
-        #models_start_end= list((zip(row_models, row_endmdls)))
-        #print(number_of_models," models in total")
-
-        #print(models_start_end)
-        #iterator = len(models_start_end) -1
-
-        #for i in range(iterator):
-        #    last_atomrecord_row = (models_start_end[i])[1] -1
-        #    line = s.iloc[last_atomrecord_row]
-        #    print(line.strip('\n'))
-        #    last_chainid = line[21]
-        #    print("Last chain id found was ",last_chainid," on row " ,last_atomrecord_row)
-
-
-            #print("changing chain ID in model", i+2)
-
-        #    nextmodel_start=(((models_start_end[i])[0])+1)
-        #    nextmodel_end=(((models_start_end[i])[1])-1)
-        #    next_model =s[nextmodel_start:nextmodel_end]
-
-        #    for row in next_model:
-        #        if row[21] == last_chainid:
-        #            row[21] == last_chainid
-
-
-            #NUMBER OF MODELS = 2
-        #    if number_of_models==100:
-            #    for line in model_series: #renaming chains
-            #        if line[21] in orig_chains:
-            #            curr_chain_id = line[21]
-            #            new_chain_id = lower_upper(curr_chain_id)
-#
-#                        pdbfile = os.path.basename(file_path)
-#                        filename_split = pdbfile.split('.')
-#                        pdbfile_chain_name = "files_for_naccess/"+filename_split[0]+new_chain_id+'.'+filename_split[1]
-#
-#                        if not os.path.exists(pdbfile_chain_name):
-#                            pdb_chain_file = open(pdbfile_chain_name, "w")
-#                            line= line[:21]+ new_chain_id+line[22:]
-#
-#                        if line.startswith("ATOM") or line.startswith("HETATM"):
-#                            pdb_chain_file.write(line.strip('\n'))
-
-#                        if line.startswith("TER"):
-#                            pdb_chain_file.close()
-
+        for file in opened_files:
+            file.close()
 
     return
 
 
 
-def lower_upper(curr_chain_id):
-    if curr_chain_id.lower():
-        new_chain_id = curr_chain_id.upper()
-
-    if curr_chain_id.upper():
-        new_chain_id = curr_chain_id.lower()
-
-    if not curr_chain_id.isalpha():
-        print("ERROR: chain id is not a letter")
-
-    return new_chain_id
-
 
 def next_available(curr_chain_id, orig_chains):
     stepsize= 1
-
     while curr_chain_id in orig_chains:
         curr_chain_id= chr(ord(curr_chain_id)+stepsize)
-        stepsize = stepsize + 1
-
     new_chain_id = curr_chain_id
-    orig_chains.append(new_chain_id)
-    #stepsize = stepsize + numb_orig_chains
 
     return new_chain_id
 
 
+def get_orig_chain_id(filename):
+    if "_" in filename:
+        seperation_by_underscore = filename.split("_")
+        separation_by_dot = seperation_by_underscore[1].split(".")
+        orig_chain_id = seperation_by_underscore[0]+"."+separation_by_dot[1]
+    else:
+        orig_chain_id = filename
 
-def calc_interaction_area():
+    return orig_chain_id
+
+
+def run_naccess(result_naccess_file):
     list_of_files=os.listdir("/proj/wallner/users/x_karst/files_for_naccess")
-    combinations_list= itertools.combinations(list_of_files, 2)
-    print(list(combination_of_files))
+
+    if len(list_of_files)==0:
+        return
+
+    combination_of_files= itertools.combinations(list_of_files, 2)
+    combinations_list = list(combination_of_files)
+    print("Doing binary comparisons . . . ")
+
+    for combination in combinations_list:
+        print(combination)
 
     for combination_tuple in combinations_list:
-        largest_area=0
         individual_chain_area = []
-        for file in combination_tuple:
-            #subprocess.run(["/proj/wallner/users/x_bjowa/local/naccess/./naccess", "/proj/wallner/user/x_karst/files_for_naccess/file"])
-            #output_file = file[:-4]+".rsa"
-            #output_file = open(output_file, "r")
-            #text = output_file.read()
-            #chain_area = re.findall("TOTAL[\s]+([\d]+)", text)
-            #individual_chain_area.append(chain_area)
-            #remove outputfile
-            largest_area=0
+        for file in combination_tuple: #each chain area for themselves
+            target_file="/proj/wallner/users/x_karst/files_for_naccess/"+file
+            subprocess.run(["/proj/wallner/users/x_bjowa/local/naccess/./naccess",target_file])
 
-        file1 = open(combination[0], "r")
-        file2 = open(combination[1], "r")
-        file3 = open("binary_file.pdb", "w")
+            filename_split = file.split('.')
+            file=filename_split[0]
+            rsa_file = file+".rsa"
+
+            rsa_file = open(rsa_file, "r")
+            text = rsa_file.read()
+            chain_area = re.findall("TOTAL[\s]+([\d.]+)", text)
+            chain_area = float(chain_area[0])
+        #    print(chain_area)
+            individual_chain_area.append(chain_area)
+
+            os.remove(file+".rsa")
+            os.remove(file+".log")
+            os.remove(file+".asa")
+
+        sum = individual_chain_area[0] + individual_chain_area[1]
+
+        path = "/proj/wallner/users/x_karst/files_for_naccess/"
+        file1 = open(path+combination_tuple[0], "r")
+        file2 = open(path+combination_tuple[1], "r")
+        binary_file = open("binary_file.pdb", "w")
 
         file1_text = file1.read()
         file2_text = file2.read()
-        file3_text= file1_text+file2_text
-        file3.write(file3_text)
+        text= file1_text+file2_text
+        binary_file.write(text)
 
         file1.close()
         file2.close()
-        file3.close()
+        binary_file.close()
 
+        subprocess.run(["/proj/wallner/users/x_bjowa/local/naccess/./naccess", "/proj/wallner/users/x_karst/binary_file.pdb"])
+        output_file = "binary_file.rsa"
+        output_file = open(output_file, "r")
+        text = output_file.read()
 
-        #subprocess.run(["/proj/wallner/users/x_bjowa/local/naccess/./naccess", "/proj/wallner/user/x_karst/files_for_naccess/binary_file.pdb"])
-        #output_file = binary_file.pdb.rsa"
-        #output_file = open(output_file, "r")
-        #text = output_file.read()
-        #chain_area = re.findall("", text)
-        #individual_chain_area.append(chain_area)
+        complex_areas = re.findall("CHAIN[\s]+[\d]+[\s]+[\w]+[\s]+([\d.]+)", text)
+        complex_area1 = float(complex_areas[0])
+        complex_area2 = float(complex_areas[1])
 
-        #calculate difference
+        size_contactarea=(sum-complex_area1-complex_area2)/2 #dela på två? avrunda..?
 
-        #save difference with the right chain name
+        input_file1 = combination_tuple[0]
+        input_file2 = combination_tuple[1]
 
+        input_file1 = get_orig_chain_id(input_file1)
+        input_file2 = get_orig_chain_id(input_file2)
 
+        result = str(input_file1)+'\t'+str(input_file2)+'\t'+str(size_contactarea)+'\n'
+        result_naccess_file.write(result)
+
+        os.remove("binary_file.rsa")
+        os.remove("binary_file.log")
+        os.remove("binary_file.asa")
+        os.remove("binary_file.pdb")
+
+    files_to_be_removed = glob.glob("/proj/wallner/users/x_karst/files_for_naccess/*")
+
+    for f in files_to_be_removed:
+        os.remove(f)
 
     return
 
@@ -331,14 +337,16 @@ def main():
             print(file)
 
 
+    result_naccess_file = open("/proj/wallner/users/x_karst/result_naccess.txt", "w")
 
     for file_path in filtered_pdb_list:
-    #file_path = "/proj/wallner/share/PDB/191015_biounit/mq/1mqn.pdb4"
         rename_chains(file_path)
-        #calc_interaction_area()
+
+        #run_naccess(result_naccess_file)
 
 
 
+    result_naccess_file.close()
 
 
 if __name__ == '__main__':
