@@ -66,6 +66,47 @@ def create_path_chain(file_path, chain_id, curr_model):
     return path_chainfile
 
 
+def rename_xchains(file_path):
+    print(file_path[-9:] + "-----------------------------------")
+    file = open(file_path, 'r')
+    s = pd.Series(file)
+    number_of_models = sum(s.str.startswith("MODEL"))
+    row_models= s.index[s.str.startswith('MODEL')].tolist()
+    row_endmdls=s.index[s.str.startswith('ENDMDL')].tolist()
+    models_start_end= list((zip(row_models, row_endmdls)))
+
+    model1_start = (models_start_end[0])[0]+1
+    model1_end = (models_start_end[0])[1]
+    model1_series=s[model1_start:model1_end]
+
+
+    if number_of_models<=1:
+        for line in model1_series:
+            chain_id = line[21]
+            path_chainfile = create_path_chain(file_path, chain_id, curr_model)
+
+            if not os.path.exists(path_chainfile) and not line.startswith("ANISOU"):
+                chain_file = open(path_chainfile, "w")
+                open_files_dict[chain_id] = chain_file
+                opened_files.append(chain_file)
+                print("Creating file "+ path_chainfile)
+
+            if line.startswith("ATOM") or line.startswith("HETATM"):
+                open_files_dict[chain_id].write(line)
+            #    print(line.strip('\n'))
+        for file in opened_files:
+            file.close()
+
+    if number_of_models>1:
+        text = s.to_string()
+        print(text)
+        chains = re.findall("TER[\s]+[\d.]+[\s]+[\w]+[\s]+([\w])",text)
+
+
+
+
+    return
+
 def rename_chains(file_path):
     print(file_path[-9:] + "-----------------------------------")
     file = open(file_path, 'r')
@@ -127,63 +168,60 @@ def rename_chains(file_path):
 
             print("Changing the chain id:s in MODEL", curr_model, ". . .")
 
-            model_start = (models_start_end[i])[0]+1 #CREATINGatom records
+            model_start = (models_start_end[i])[0]+1 #atom records
             model_end = (models_start_end[i])[1] #last row of atom (or hetatm) records
             model_series = s[model_start:model_end]
 
             for line in model_series: #renaming chains
                 curr_chain_id = line[21]
-                if curr_chain_id in orig_chains:
-                    if curr_chain_id in temp_dict:
-                        new_chain_id = temp_dict[curr_chain_id]
-                    else:
-                        new_chain_id = next_available(curr_chain_id, orig_chains)
-                        temp_dict[curr_chain_id] = new_chain_id
-                        orig_chains.append(new_chain_id)
-
-                    line= line[:21]+ new_chain_id+line[22:]
+                if curr_chain_id in temp_dict:
+                    new_chain_id = temp_dict[curr_chain_id]
+                else:
+                    new_chain_id = next_available(curr_chain_id, orig_chains)
+                    temp_dict[curr_chain_id] = new_chain_id
+                    orig_chains.append(new_chain_id)
                     path_chainfile = create_path_renamed_chain(file_path, curr_chain_id, curr_model, new_chain_id)
-                    chain_id = new_chain_id
 
-                    if not os.path.exists(path_chainfile) and not line.startswith("ANISOU"):
-                        chain_file = open(path_chainfile, "w")
-                        open_files_dict[chain_id] = chain_file
-                        opened_files.append(chain_file)
-                        print("Creating file "+path_chainfile)
+                line= line[:21]+ new_chain_id+line[22:]
+                chain_id = new_chain_id
 
-                    if line.startswith("ATOM") or line.startswith("HETATM"):
-                        chain_id = line[21]
-                        open_files_dict[chain_id].write(line)
-                        #print(line.strip('\n'))
+                if not os.path.exists(path_chainfile) and not line.startswith("ANISOU"):
+                    chain_file = open(path_chainfile, "w")
+                    open_files_dict[chain_id] = chain_file
+                    opened_files.append(chain_file)
+                    print("Creating file "+path_chainfile)
 
-                    previous_chain = curr_chain_id
-                    new_model = False
+                if line.startswith("ATOM") or line.startswith("HETATM"):
+                    chain_id = line[21]
+                    open_files_dict[chain_id].write(line)
+                    #print(line.strip('\n'))
 
-                else: #some files with multiple models already have unique chain ids
-                    chain_id=line[21]
+                previous_chain = curr_chain_id
+                #new_model = False
 
-                    if curr_chain_id in orig_chains:
-                        if curr_chain_id in temp_dict:
-                            new_chain_id = temp_dict[curr_chain_id]
-                        else:
-                            new_chain_id = next_available(curr_chain_id, orig_chains)
-                            temp_dict[curr_chain_id] = new_chain_id
-                            orig_chains.append(new_chain_id)
-                        line= line[:21]+ new_chain_id+line[22:]
+            #    else: #some files with multiple models already have unique chain ids
+            #        chain_id=line[21]
 
-                    path_chainfile = create_path_chain(file_path, chain_id, curr_model)
+                    #line= line[:21]+ new_chain_id+line[22:]
 
-                    if not os.path.exists(path_chainfile) and not line.startswith("ANISOU"):
-                        chain_file = open(path_chainfile, "w")
-                        open_files_dict[chain_id] = chain_file
-                        opened_files.append(chain_file)
-                        print("Creating ~special~ file "+path_chainfile)
+                #    path_chainfile = create_path_chain(file_path, chain_id, curr_model)
 
-                    if line.startswith("ATOM") or line.startswith("HETATM"):
-                        open_files_dict[chain_id].write(line)
-                        #print(line.strip('\n'))
+                    # if not os.path.exists(path_chainfile) and not line.startswith("ANISOU"):
+                    #     chain_file = open(path_chainfile, "w")
+                    #     open_files_dict[chain_id] = chain_file
+                    #     opened_files.append(chain_file)
+                    #     print("Creating ~special~ file "+path_chainfile)
+                    #
+                    # if line.startswith("ATOM") or line.startswith("HETATM"):
+                    #     chain_id = line[21]
+                    #     open_files_dict[chain_id].write(line)
+                    #     #print(line.strip('\n'))
+                    # if line.startswith("TER"):
+                    #     chain =line[21]
+                    #     orig_chains.append(chain)
 
 
+            print(orig_chains)
             temp_dict = {}
             prev_model = curr_model
             for file in opened_files:
@@ -300,6 +338,7 @@ def run_naccess(result_naccess_file):
         complex_area2 = float(complex_areas[1])
 
         size_contactarea=(sum-complex_area1-complex_area2)/2
+        size_contactarea = round(size_contactarea, 4)
 
         if size_contactarea>0:
             input_file1 = combination_tuple[0]
@@ -349,7 +388,6 @@ def main():
     result_naccess_file = open("/proj/wallner/users/x_karst/exjobb/result_naccess.txt", "w")
 
     for file_path in filtered_pdb_list:
-
         rename_chains(file_path)
         run_naccess(result_naccess_file)
 
