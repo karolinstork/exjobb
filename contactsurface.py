@@ -54,14 +54,14 @@ def count_models_chains(file):
 def create_path_renamed_chain(file_path, curr_chain_id, curr_model, new_chain_id):
     pdbfile = os.path.basename(file_path)
     filename_split = pdbfile.split('.')
-    path_chainfile = "files_for_naccess/"+filename_split[0]+curr_chain_id+str(curr_model)+"_"+new_chain_id+'.'+filename_split[1]
+    path_chainfile = f'files_for_naccess/{filename_split[0]}{curr_chain_id}{curr_model}_{new_chain_id}.{filename_split[1]}'
 
     return path_chainfile
 
 def create_path_chain(file_path, chain_id, curr_model):
     pdbfile = os.path.basename(file_path)
     filename_split = pdbfile.split('.')
-    path_chainfile = "files_for_naccess/"+filename_split[0]+chain_id+str(curr_model)+'.'+filename_split[1]
+    path_chainfile = f'files_for_naccess/{filename_split[0]}{chain_id}{curr_model}.{filename_split[1]}'
 
     return path_chainfile
 
@@ -161,6 +161,16 @@ def rename_chains(file_path):
 
                 else: #some files with multiple models already have unique chain ids
                     chain_id=line[21]
+
+                    if curr_chain_id in orig_chains:
+                        if curr_chain_id in temp_dict:
+                            new_chain_id = temp_dict[curr_chain_id]
+                        else:
+                            new_chain_id = next_available(curr_chain_id, orig_chains)
+                            temp_dict[curr_chain_id] = new_chain_id
+                            orig_chains.append(new_chain_id)
+                        line= line[:21]+ new_chain_id+line[22:]
+
                     path_chainfile = create_path_chain(file_path, chain_id, curr_model)
 
                     if not os.path.exists(path_chainfile) and not line.startswith("ANISOU"):
@@ -233,7 +243,7 @@ def get_orig_chain_id(filename):
 
 
 def run_naccess(result_naccess_file):
-    list_of_files=os.listdir("/proj/wallner/users/x_karst/files_for_naccess")
+    list_of_files=os.listdir("/proj/wallner/users/x_karst/exjobb/files_for_naccess")
 
     if len(list_of_files)==0:
         return
@@ -242,18 +252,16 @@ def run_naccess(result_naccess_file):
     combinations_list = list(combination_of_files)
     print("Doing binary comparisons . . . ")
 
-    for combination in combinations_list:
-        print(combination)
-
     for combination_tuple in combinations_list:
+        print(combination_tuple)
         individual_chain_area = []
         for file in combination_tuple: #each chain area for themselves
-            target_file="/proj/wallner/users/x_karst/files_for_naccess/"+file
+            target_file=f'/proj/wallner/users/x_karst/exjobb/files_for_naccess/{file}'
             subprocess.run(["/proj/wallner/users/x_bjowa/local/naccess/./naccess",target_file])
 
             filename_split = file.split('.')
             file=filename_split[0]
-            rsa_file = file+".rsa"
+            rsa_file = f'{file}.rsa'
 
             rsa_file = open(rsa_file, "r")
             text = rsa_file.read()
@@ -268,7 +276,7 @@ def run_naccess(result_naccess_file):
 
         sum = individual_chain_area[0] + individual_chain_area[1]
 
-        path = "/proj/wallner/users/x_karst/files_for_naccess/"
+        path = "/proj/wallner/users/x_karst/exjobb/files_for_naccess/"
         file1 = open(path+combination_tuple[0], "r")
         file2 = open(path+combination_tuple[1], "r")
         binary_file = open("binary_file.pdb", "w")
@@ -282,7 +290,7 @@ def run_naccess(result_naccess_file):
         file2.close()
         binary_file.close()
 
-        subprocess.run(["/proj/wallner/users/x_bjowa/local/naccess/./naccess", "/proj/wallner/users/x_karst/binary_file.pdb"])
+        subprocess.run(["/proj/wallner/users/x_bjowa/local/naccess/./naccess", "/proj/wallner/users/x_karst/exjobb/binary_file.pdb"])
         output_file = "binary_file.rsa"
         output_file = open(output_file, "r")
         text = output_file.read()
@@ -291,23 +299,24 @@ def run_naccess(result_naccess_file):
         complex_area1 = float(complex_areas[0])
         complex_area2 = float(complex_areas[1])
 
-        size_contactarea=(sum-complex_area1-complex_area2)/2 #dela på två? avrunda..?
+        size_contactarea=(sum-complex_area1-complex_area2)/2
 
-        input_file1 = combination_tuple[0]
-        input_file2 = combination_tuple[1]
+        if size_contactarea>0:
+            input_file1 = combination_tuple[0]
+            input_file2 = combination_tuple[1]
 
-        input_file1 = get_orig_chain_id(input_file1)
-        input_file2 = get_orig_chain_id(input_file2)
+            input_file1 = get_orig_chain_id(input_file1)
+            input_file2 = get_orig_chain_id(input_file2)
 
-        result = str(input_file1)+'\t'+str(input_file2)+'\t'+str(size_contactarea)+'\n'
-        result_naccess_file.write(result)
+            result = f'{input_file1}\t{input_file2}\t{size_contactarea}\n'
+            result_naccess_file.write(result)
 
         os.remove("binary_file.rsa")
         os.remove("binary_file.log")
         os.remove("binary_file.asa")
         os.remove("binary_file.pdb")
 
-    files_to_be_removed = glob.glob("/proj/wallner/users/x_karst/files_for_naccess/*")
+    files_to_be_removed = glob.glob("/proj/wallner/users/x_karst/exjobb/files_for_naccess/*")
 
     for f in files_to_be_removed:
         os.remove(f)
@@ -337,12 +346,12 @@ def main():
             print(file)
 
 
-    result_naccess_file = open("/proj/wallner/users/x_karst/result_naccess.txt", "w")
+    result_naccess_file = open("/proj/wallner/users/x_karst/exjobb/result_naccess.txt", "w")
 
     for file_path in filtered_pdb_list:
-        rename_chains(file_path)
 
-        #run_naccess(result_naccess_file)
+        rename_chains(file_path)
+        run_naccess(result_naccess_file)
 
 
 
