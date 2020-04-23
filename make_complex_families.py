@@ -19,7 +19,7 @@ warnings.simplefilter('ignore', BiopythonWarning) #ignores if chains are non con
 
 
 
-def find_representative(cluster_file):
+def find_representative(cluster_file, naccess_file):
     files_1 = []
     files_2 = []
     cluster_file = open(cluster_file, 'r')
@@ -38,17 +38,18 @@ def find_representative(cluster_file):
 
         files_group1_list =string1.split()
         files_group2_list =string2.split()
-        string_combinations = list(itertools.product(files_group1_list, files_group2_list)) #making all binary combinations
+        string_combinations = list(itertools.product(files_group1_list, files_group2_list)) #making all binary combinations 1quuA.pdb1
 
         for string_combination in string_combinations:
             file1 = string_combination[0]
             file2 = string_combination[1]
-
             complex = compare_strings(file1, file2)
+
             if complex:
                 area = get_interface_area(file1, file2)
-                dict[(file1, file2)] = area
-
+                if area != None:
+                    print("appending to dict ", file1, file2, area)
+                    dict[(file1, file2)] = area
 
         biggest_area = max(dict.values())
         threshold = biggest_area*0.7
@@ -61,6 +62,7 @@ def find_representative(cluster_file):
         representative = max(reso_dict.items(), key=operator.itemgetter(1))[0]
 
     cluster_file.close()
+
     return
 
 def compare_strings(file1, file2):
@@ -73,17 +75,23 @@ def compare_strings(file1, file2):
     return complex
 
 def get_interface_area(file1, file2):
-    naccess_file = open("/proj/wallner/users/x_karst/exjobb/result_naccess_ix.txt", "r")
+    naccess_file = open("/proj/wallner/users/x_karst/exjobb/result_naccess_hc.txt", "r")
     text = naccess_file.read()
-    target = str(file1+'\t'+file2+"'\t'([\d.]+)")
-    area = re.findall(target, text)
-    naccess_file.close()
 
-    if len(area)>0:
-        print(file1, file2, area[0])
-        return area[0]
-    else:
-        print("combination not found in naccess file")
+    file1_parts = file1.split(".")
+    file2_parts = file2.split(".")
+
+
+    file1_file2_area_list = re.findall(rf"({file1_parts[0]}[\d].{file1_parts[1]})[\t]({file2_parts[0]}[\d].{file1_parts[1]})[\t]([\d.]+)", text)
+
+    if len(file1_file2_area_list)<1:
+        print("no interface area was found between ", file1, file2)
+
+    #else:
+        #find biggest area?
+
+
+    naccess_file.close()
 
     return
 
@@ -101,15 +109,15 @@ def main():
     args = sys.argv[1:]
     try:
         cluster_file = args[0]
-        #naccess_file = args[1]
+        naccess_file = args[1]
     except IndexError:
         print("ERROR: <file> <cluster_file> <naccess_file>")
 
 
 
     dataset_file = open("dataset_file.txt", "w")
-    
-    find_representative(cluster_file) #naccess_file
+
+    find_representative(cluster_file, naccess_file)
 
     dataset_file.close()
 
