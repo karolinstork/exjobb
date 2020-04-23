@@ -1,4 +1,7 @@
 #!/usr/bin/env python
+#SBATCH -t 7-00:00:00
+#SBATCH -N 1
+
 import sys
 import os
 import fnmatch
@@ -295,7 +298,17 @@ def run_naccess(result_naccess_file):
         individual_chain_area = []
         for file in combination_tuple: #each chain area for themselves
             target_file=f'/proj/wallner/users/x_karst/exjobb/files_for_naccess/{file}'
-            subprocess.run(["/proj/wallner/users/x_bjowa/local/naccess/./naccess",target_file])
+            try:
+                subprocess.run(["/proj/wallner/users/x_bjowa/local/naccess/./naccess", target_file], timeout = 10)
+            except subprocess.TimeoutExpired:
+                print("Time limit exceeded for ", file)
+                files_to_be_removed = glob.glob("/proj/wallner/users/x_karst/exjobb/files_for_naccess/*")
+                for f in files_to_be_removed:
+                    os.remove(f)
+                    
+
+                return
+
 
             filename_split = file.split('.')
             file=filename_split[0]
@@ -304,8 +317,8 @@ def run_naccess(result_naccess_file):
             rsa_file = open(rsa_file, "r")
             text = rsa_file.read()
             chain_area = re.findall("TOTAL[\s]+([\d.]+)", text)
+
             chain_area = float(chain_area[0])
-        #    print(chain_area)
             individual_chain_area.append(chain_area)
 
             os.remove(file+".rsa")
@@ -328,7 +341,20 @@ def run_naccess(result_naccess_file):
         file2.close()
         binary_file.close()
 
-        subprocess.run(["/proj/wallner/users/x_bjowa/local/naccess/./naccess", "/proj/wallner/users/x_karst/exjobb/binary_file.pdb"])
+        try:
+            subprocess.run(["/proj/wallner/users/x_bjowa/local/naccess/./naccess", "/proj/wallner/users/x_karst/exjobb/binary_file.pdb"], timeout = 10)
+        except subprocess.TimeoutExpired:
+            print("Time limit exceeded for binary_file.pdb")
+            files_to_be_removed = glob.glob("/proj/wallner/users/x_karst/exjobb/files_for_naccess/*")
+            for f in files_to_be_removed:
+                os.remove(f)
+            os.remove(file+".rsa")
+            os.remove(file+".log")
+            os.remove(file+".asa")
+
+            return
+
+
         output_file = "binary_file.rsa"
         output_file = open(output_file, "r")
         text = output_file.read()
@@ -386,6 +412,7 @@ def main():
 
 
     result_naccess_file = open("/proj/wallner/users/x_karst/exjobb/result_naccess.txt", "w")
+
 
     for file_path in filtered_pdb_list:
         rename_chains(file_path)
