@@ -77,6 +77,11 @@ def rename_chains(file_path):
     file = open(file_path, 'r')
     s = pd.Series(file)
 
+    check_for_atomrec= s.index[s.str.startswith('ATOM')].tolist()
+    if len(check_for_atomrec)<1:
+        print(f"No atom records in this file. {file_path[-9:]} removed.")
+        return
+
     number_of_models = sum(s.str.startswith("MODEL"))
     row_models= s.index[s.str.startswith('MODEL')].tolist()
     row_endmdls=s.index[s.str.startswith('ENDMDL')].tolist()
@@ -155,7 +160,7 @@ def rename_chains(file_path):
                     opened_files.append(chain_file)
                     print("Creating file "+path_chainfile)
 
-                if line.startswith("ATOM") or line.startswith("HETATM"):
+                if line.startswith("ATOM") or line.startswith("HETATM") or line.startswith("TER"):
                     chain_id = line[21]
                     open_files_dict[chain_id].write(line)
                     #print(line.strip('\n'))
@@ -205,10 +210,8 @@ def rename_chains(file_path):
 
 def next_available(curr_chain_id, orig_chains):
     stepsize= 1
-    while curr_chain_id in orig_chains:
+    while curr_chain_id in orig_chains or curr_chain_id.isalpha() == False:
         curr_chain_id= chr(ord(curr_chain_id)+stepsize)
-        if not curr_chain_id.isalpha():
-            curr_chain_id= chr(ord(curr_chain_id)+stepsize)
 
     new_chain_id = curr_chain_id
 
@@ -244,7 +247,7 @@ def run_naccess(result_naccess_file, file_path):
         for file in combination_tuple: #each chain area for themselves
             target_file=f'/proj/wallner/users/x_karst/exjobb/files_for_naccess/{dir}/{file}'
             try:
-                subprocess.run(["/proj/wallner/users/x_bjowa/local/naccess/./naccess", target_file], timeout = 10)
+                subprocess.run(["/proj/wallner/users/x_bjowa/local/naccess/./naccess", target_file, "-h"], timeout = 10)
             except subprocess.TimeoutExpired:
                 print("Time limit exceeded for ", file)
                 files_to_be_removed = glob.glob("/proj/wallner/users/x_karst/exjobb/files_for_naccess/"+dir+"/*")
@@ -260,14 +263,17 @@ def run_naccess(result_naccess_file, file_path):
             rsa_file = open(rsa_file, "r")
             text = rsa_file.read()
             chain_area = re.findall("TOTAL[\s]+([\d.]+)", text)
+            print(file, chain_area[0])
 
             chain_area = float(chain_area[0])
             individual_chain_area.append(chain_area)
+            print("removing .rsa .log .asa")
 
             os.remove(f'/proj/wallner/users/x_karst/exjobb/{file}.rsa')
             os.remove(f'/proj/wallner/users/x_karst/exjobb/{file}.log')
             os.remove(f'/proj/wallner/users/x_karst/exjobb/{file}.asa')
 
+        print("calculating sum")
         sum = individual_chain_area[0] + individual_chain_area[1]
 
         path = f'/proj/wallner/users/x_karst/exjobb/files_for_naccess/{dir}/'
@@ -278,7 +284,7 @@ def run_naccess(result_naccess_file, file_path):
         parts2 = combination_tuple[1].split(".")
 
         combo_file = str(parts1[0])+"_"+str(parts2[0])
-
+        print("creating combo file")
         binary_file = open("/proj/wallner/users/x_karst/exjobb/"+combo_file+".pdb", "w")
 
         file1_text = file1.read()
@@ -291,7 +297,7 @@ def run_naccess(result_naccess_file, file_path):
         binary_file.close()
 
         try:
-            subprocess.run(["/proj/wallner/users/x_bjowa/local/naccess/./naccess", f"/proj/wallner/users/x_karst/exjobb/{combo_file}.pdb"], timeout = 10)
+            subprocess.run(["/proj/wallner/users/x_bjowa/local/naccess/./naccess", f"/proj/wallner/users/x_karst/exjobb/{combo_file}.pdb", "-h"], timeout = 10)
         except subprocess.TimeoutExpired:
             print("Time limit exceeded for binary_file.pdb")
             files_to_be_removed = glob.glob("/proj/wallner/users/x_karst/exjobb/files_for_naccess/"+dir+"/*")
@@ -299,9 +305,9 @@ def run_naccess(result_naccess_file, file_path):
             for f in files_to_be_removed:
                 os.remove(f)
 
-            os.remove(f'/proj/wallner/users/x_karst/exjobb/{file}.rsa')
-            os.remove(f'/proj/wallner/users/x_karst/exjobb/{file}.log')
-            os.remove(f'/proj/wallner/users/x_karst/exjobb/{file}.asa')
+            os.remove(f'/proj/wallner/users/x_karst/exjobb/{combo_file}.rsa')
+            os.remove(f'/proj/wallner/users/x_karst/exjobb/{combo_file}.log')
+            os.remove(f'/proj/wallner/users/x_karst/exjobb/{combo_file}.asa')
 
             return
 
@@ -309,11 +315,11 @@ def run_naccess(result_naccess_file, file_path):
         output_file = f"/proj/wallner/users/x_karst/exjobb/{combo_file}.rsa"
         output_file = open(output_file, "r")
         text = output_file.read()
-
-        complex_areas = re.findall("CHAIN[\s]+[\d]+[\s]+[\w]+[\s]+([\d.]+)", text)
+        print("constructing pattern")
+        complex_areas = re.findall("CHAIN[\s]+[\d]+[\s]+[\w.]+[\s]+([\d.]+)", text)
         complex_area1 = float(complex_areas[0])
         complex_area2 = float(complex_areas[1])
-
+        print("calculating contactarea")
         size_contactarea=(sum-complex_area1-complex_area2)/2
         size_contactarea = round(size_contactarea, 4)
 
@@ -365,11 +371,15 @@ def main():
 
     result_naccess_file = open("/proj/wallner/users/x_karst/exjobb/results_naccess/result_naccess_"+dir+".txt", "w")
 
-
     for file_path in filtered_pdb_list:
-        rename_chains(file_path)
-        run_naccess(result_naccess_file, file_path)
-
+        try:
+            rename_chains(file_path)
+            run_naccess(result_naccess_file, file_path)
+        except Exception as error:
+            print(error)
+            print("In "+file_path)
+            os.rename(r"/proj/wallner/users/x_karst/exjobb/results_naccess/result_naccess_"+dir+".txt",r"/proj/wallner/users/x_karst/exjobb/results_naccess/result_naccess_"+dir+"_ERROR.txt" )
+            break
 
 
     result_naccess_file.close()
