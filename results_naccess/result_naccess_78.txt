@@ -1,0 +1,5 @@
+378dB1.pdb1	378dA1.pdb1	342.5
+378dD1.pdb2	378dC1.pdb2	360.0
+178dA1.pdb1	178dB1.pdb1	558.85
+278dA1.pdb1	278dA2.pdb1	265.3
+478dB1.pdb1	478dA1.pdb1	437.45

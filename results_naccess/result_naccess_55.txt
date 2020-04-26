@@ -1,0 +1,3 @@
+455dB1.pdb1	455dA1.pdb1	571.4
+355dB1.pdb1	355dA1.pdb1	571.5
+255dA1.pdb1	255dA2.pdb1	564.8

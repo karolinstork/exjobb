@@ -1,0 +1,3 @@
+10mhA1.pdb1	10mhB1.pdb1	579.15
+10mhA1.pdb1	10mhC1.pdb1	789.9
+10mhB1.pdb1	10mhC1.pdb1	543.75

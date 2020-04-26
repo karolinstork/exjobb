@@ -1,0 +1,4 @@
+211dA2.pdb1	211dA1.pdb1	323.25
+311dA1.pdb1	311dB1.pdb1	570.5
+411dA1.pdb1	411dB1.pdb1	492.8
+111dB1.pdb1	111dA1.pdb1	564.65

@@ -1,0 +1,6 @@
+185dD1.pdb1	185dC1.pdb1	283.8
+185dD1.pdb1	185dA1.pdb1	101.95
+185dC1.pdb1	185dA1.pdb1	102.35
+385dA1.pdb1	385dA2.pdb1	289.1
+285dB1.pdb1	285dA1.pdb1	551.9
+485dA1.pdb1	485dB1.pdb1	394.7

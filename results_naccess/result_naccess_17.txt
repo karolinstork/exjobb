@@ -1,0 +1,5 @@
+117dA2.pdb1	117dA1.pdb1	589.35
+217dA2.pdb1	217dA1.pdb1	351.1
+317dA1.pdb1	317dA2.pdb1	412.2
+117eA1.pdb1	117eB1.pdb1	994.6
+417dB1.pdb1	417dA1.pdb1	249.9

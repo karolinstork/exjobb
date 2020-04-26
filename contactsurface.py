@@ -16,6 +16,7 @@ import itertools
 import glob
 
 
+
 import warnings
 from Bio import BiopythonWarning
 warnings.simplefilter('ignore', BiopythonWarning) #ignores if chains are non continous
@@ -56,59 +57,20 @@ def count_models_chains(file):
 
 def create_path_renamed_chain(file_path, curr_chain_id, curr_model, new_chain_id):
     pdbfile = os.path.basename(file_path)
+    dir = pdbfile[1:3]
     filename_split = pdbfile.split('.')
-    path_chainfile = f'files_for_naccess/{filename_split[0]}{curr_chain_id}{curr_model}_{new_chain_id}.{filename_split[1]}'
+    path_chainfile = f"files_for_naccess/{dir}/{filename_split[0]}{curr_chain_id}{curr_model}_{new_chain_id}.{filename_split[1]}"
 
     return path_chainfile
 
 def create_path_chain(file_path, chain_id, curr_model):
     pdbfile = os.path.basename(file_path)
+    dir = pdbfile[1:3]
     filename_split = pdbfile.split('.')
-    path_chainfile = f'files_for_naccess/{filename_split[0]}{chain_id}{curr_model}.{filename_split[1]}'
+    path_chainfile = f"files_for_naccess/{dir}/{filename_split[0]}{chain_id}{curr_model}.{filename_split[1]}"
 
     return path_chainfile
 
-
-def rename_xchains(file_path):
-    print(file_path[-9:] + "-----------------------------------")
-    file = open(file_path, 'r')
-    s = pd.Series(file)
-    number_of_models = sum(s.str.startswith("MODEL"))
-    row_models= s.index[s.str.startswith('MODEL')].tolist()
-    row_endmdls=s.index[s.str.startswith('ENDMDL')].tolist()
-    models_start_end= list((zip(row_models, row_endmdls)))
-
-    model1_start = (models_start_end[0])[0]+1
-    model1_end = (models_start_end[0])[1]
-    model1_series=s[model1_start:model1_end]
-
-
-    if number_of_models<=1:
-        for line in model1_series:
-            chain_id = line[21]
-            path_chainfile = create_path_chain(file_path, chain_id, curr_model)
-
-            if not os.path.exists(path_chainfile) and not line.startswith("ANISOU"):
-                chain_file = open(path_chainfile, "w")
-                open_files_dict[chain_id] = chain_file
-                opened_files.append(chain_file)
-                print("Creating file "+ path_chainfile)
-
-            if line.startswith("ATOM") or line.startswith("HETATM"):
-                open_files_dict[chain_id].write(line)
-            #    print(line.strip('\n'))
-        for file in opened_files:
-            file.close()
-
-    if number_of_models>1:
-        text = s.to_string()
-        print(text)
-        chains = re.findall("TER[\s]+[\d.]+[\s]+[\w]+[\s]+([\w])",text)
-
-
-
-
-    return
 
 def rename_chains(file_path):
     print(file_path[-9:] + "-----------------------------------")
@@ -164,7 +126,6 @@ def rename_chains(file_path):
         for file in opened_files:
             file.close()
 
-
         for i in range(1,len(models_start_end)): #rest of models, change chain ids
             new_model = True
             curr_model=i+1
@@ -201,27 +162,6 @@ def rename_chains(file_path):
 
                 previous_chain = curr_chain_id
                 #new_model = False
-
-            #    else: #some files with multiple models already have unique chain ids
-            #        chain_id=line[21]
-
-                    #line= line[:21]+ new_chain_id+line[22:]
-
-                #    path_chainfile = create_path_chain(file_path, chain_id, curr_model)
-
-                    # if not os.path.exists(path_chainfile) and not line.startswith("ANISOU"):
-                    #     chain_file = open(path_chainfile, "w")
-                    #     open_files_dict[chain_id] = chain_file
-                    #     opened_files.append(chain_file)
-                    #     print("Creating ~special~ file "+path_chainfile)
-                    #
-                    # if line.startswith("ATOM") or line.startswith("HETATM"):
-                    #     chain_id = line[21]
-                    #     open_files_dict[chain_id].write(line)
-                    #     #print(line.strip('\n'))
-                    # if line.startswith("TER"):
-                    #     chain =line[21]
-                    #     orig_chains.append(chain)
 
 
             print(orig_chains)
@@ -267,6 +207,9 @@ def next_available(curr_chain_id, orig_chains):
     stepsize= 1
     while curr_chain_id in orig_chains:
         curr_chain_id= chr(ord(curr_chain_id)+stepsize)
+        if not curr_chain_id.isalpha():
+            curr_chain_id= chr(ord(curr_chain_id)+stepsize)
+
     new_chain_id = curr_chain_id
 
     return new_chain_id
@@ -283,8 +226,10 @@ def get_orig_chain_id(filename):
     return orig_chain_id
 
 
-def run_naccess(result_naccess_file):
-    list_of_files=os.listdir("/proj/wallner/users/x_karst/exjobb/files_for_naccess")
+def run_naccess(result_naccess_file, file_path):
+    pdbfile = os.path.basename(file_path)
+    dir = pdbfile[1:3]
+    list_of_files=os.listdir("/proj/wallner/users/x_karst/exjobb/files_for_naccess/"+dir)
 
     if len(list_of_files)==0:
         return
@@ -297,22 +242,20 @@ def run_naccess(result_naccess_file):
         print(combination_tuple)
         individual_chain_area = []
         for file in combination_tuple: #each chain area for themselves
-            target_file=f'/proj/wallner/users/x_karst/exjobb/files_for_naccess/{file}'
+            target_file=f'/proj/wallner/users/x_karst/exjobb/files_for_naccess/{dir}/{file}'
             try:
                 subprocess.run(["/proj/wallner/users/x_bjowa/local/naccess/./naccess", target_file], timeout = 10)
             except subprocess.TimeoutExpired:
                 print("Time limit exceeded for ", file)
-                files_to_be_removed = glob.glob("/proj/wallner/users/x_karst/exjobb/files_for_naccess/*")
+                files_to_be_removed = glob.glob("/proj/wallner/users/x_karst/exjobb/files_for_naccess/"+dir+"/*")
                 for f in files_to_be_removed:
                     os.remove(f)
-                    
 
                 return
 
-
             filename_split = file.split('.')
             file=filename_split[0]
-            rsa_file = f'{file}.rsa'
+            rsa_file = f'/proj/wallner/users/x_karst/exjobb/{file}.rsa'
 
             rsa_file = open(rsa_file, "r")
             text = rsa_file.read()
@@ -321,16 +264,22 @@ def run_naccess(result_naccess_file):
             chain_area = float(chain_area[0])
             individual_chain_area.append(chain_area)
 
-            os.remove(file+".rsa")
-            os.remove(file+".log")
-            os.remove(file+".asa")
+            os.remove(f'/proj/wallner/users/x_karst/exjobb/{file}.rsa')
+            os.remove(f'/proj/wallner/users/x_karst/exjobb/{file}.log')
+            os.remove(f'/proj/wallner/users/x_karst/exjobb/{file}.asa')
 
         sum = individual_chain_area[0] + individual_chain_area[1]
 
-        path = "/proj/wallner/users/x_karst/exjobb/files_for_naccess/"
+        path = f'/proj/wallner/users/x_karst/exjobb/files_for_naccess/{dir}/'
         file1 = open(path+combination_tuple[0], "r")
         file2 = open(path+combination_tuple[1], "r")
-        binary_file = open("binary_file.pdb", "w")
+
+        parts1 = combination_tuple[0].split(".")
+        parts2 = combination_tuple[1].split(".")
+
+        combo_file = str(parts1[0])+"_"+str(parts2[0])
+
+        binary_file = open("/proj/wallner/users/x_karst/exjobb/"+combo_file+".pdb", "w")
 
         file1_text = file1.read()
         file2_text = file2.read()
@@ -342,20 +291,22 @@ def run_naccess(result_naccess_file):
         binary_file.close()
 
         try:
-            subprocess.run(["/proj/wallner/users/x_bjowa/local/naccess/./naccess", "/proj/wallner/users/x_karst/exjobb/binary_file.pdb"], timeout = 10)
+            subprocess.run(["/proj/wallner/users/x_bjowa/local/naccess/./naccess", f"/proj/wallner/users/x_karst/exjobb/{combo_file}.pdb"], timeout = 10)
         except subprocess.TimeoutExpired:
             print("Time limit exceeded for binary_file.pdb")
-            files_to_be_removed = glob.glob("/proj/wallner/users/x_karst/exjobb/files_for_naccess/*")
+            files_to_be_removed = glob.glob("/proj/wallner/users/x_karst/exjobb/files_for_naccess/"+dir+"/*")
+
             for f in files_to_be_removed:
                 os.remove(f)
-            os.remove(file+".rsa")
-            os.remove(file+".log")
-            os.remove(file+".asa")
+
+            os.remove(f'/proj/wallner/users/x_karst/exjobb/{file}.rsa')
+            os.remove(f'/proj/wallner/users/x_karst/exjobb/{file}.log')
+            os.remove(f'/proj/wallner/users/x_karst/exjobb/{file}.asa')
 
             return
 
 
-        output_file = "binary_file.rsa"
+        output_file = f"/proj/wallner/users/x_karst/exjobb/{combo_file}.rsa"
         output_file = open(output_file, "r")
         text = output_file.read()
 
@@ -376,12 +327,12 @@ def run_naccess(result_naccess_file):
             result = f'{input_file1}\t{input_file2}\t{size_contactarea}\n'
             result_naccess_file.write(result)
 
-        os.remove("binary_file.rsa")
-        os.remove("binary_file.log")
-        os.remove("binary_file.asa")
-        os.remove("binary_file.pdb")
+        os.remove(f"/proj/wallner/users/x_karst/exjobb/{combo_file}.rsa")
+        os.remove(f"/proj/wallner/users/x_karst/exjobb/{combo_file}.log")
+        os.remove(f"/proj/wallner/users/x_karst/exjobb/{combo_file}.asa")
+        os.remove(f"/proj/wallner/users/x_karst/exjobb/{combo_file}.pdb")
 
-    files_to_be_removed = glob.glob("/proj/wallner/users/x_karst/exjobb/files_for_naccess/*")
+    files_to_be_removed = glob.glob("/proj/wallner/users/x_karst/exjobb/files_for_naccess/"+dir+"/*")
 
     for f in files_to_be_removed:
         os.remove(f)
@@ -395,6 +346,7 @@ def run_naccess(result_naccess_file):
 def main():
     args = sys.argv[1:]
     dir_name = args[0]
+    dir = dir_name[-2:]
 
     list_of_files = find_pdbfiles(dir_name)
     filtered_pdb_list=[]
@@ -411,12 +363,12 @@ def main():
             print(file)
 
 
-    result_naccess_file = open("/proj/wallner/users/x_karst/exjobb/result_naccess.txt", "w")
+    result_naccess_file = open("/proj/wallner/users/x_karst/exjobb/results_naccess/result_naccess_"+dir+".txt", "w")
 
 
     for file_path in filtered_pdb_list:
         rename_chains(file_path)
-        run_naccess(result_naccess_file)
+        run_naccess(result_naccess_file, file_path)
 
 
 

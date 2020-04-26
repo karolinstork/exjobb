@@ -1,0 +1,4 @@
+477dB1.pdb1	477dA1.pdb1	456.25
+377dA1.pdb1	377dB1.pdb1	315.95
+377dD1.pdb2	377dC1.pdb2	316.55
+277dA1.pdb1	277dA2.pdb1	259.7

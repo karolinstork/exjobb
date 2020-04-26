@@ -1,0 +1,3 @@
+115dB1.pdb1	115dA1.pdb1	384.15
+315dA1.pdb1	315dB1.pdb1	392.0
+215dA1.pdb1	215dA2.pdb1	288.4

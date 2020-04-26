@@ -1,0 +1,8 @@
+454dB1.pdb1	454dA1.pdb1	360.65
+154dB1.pdb1	154dA1.pdb1	97.4
+454dG1.pdb4	454dH1.pdb4	362.7
+454dF1.pdb3	454dE1.pdb3	361.5
+454dC1.pdb2	454dD1.pdb2	358.7
+354dA1.pdb1	354dB1.pdb1	686.7
+454dJ1.pdb5	454dI1.pdb5	362.1
+254dB1.pdb1	254dA1.pdb1	282.8

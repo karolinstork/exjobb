@@ -1,0 +1,3 @@
+474dB1.pdb1	474dA1.pdb1	403.95
+474dD1.pdb2	474dC1.pdb2	405.45
+274dA1.pdb1	274dA2.pdb1	469.0

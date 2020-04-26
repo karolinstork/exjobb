@@ -1,0 +1,4 @@
+407dA1.pdb1	407dB1.pdb1	467.15
+307dB1.pdb1	307dA1.pdb1	447.0
+307dD1.pdb2	307dC1.pdb2	455.1
+307dE1.pdb3	307dF1.pdb3	441.4
