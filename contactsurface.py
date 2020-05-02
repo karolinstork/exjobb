@@ -77,11 +77,19 @@ def rename_chains(file_path):
     file = open(file_path, 'r')
     s = pd.Series(file)
 
+    pdbfile = os.path.basename(file_path)
+    dir = pdbfile[1:3]
+
+    aminoacid_list = ["ALA", "ARG", "ASN", "ASP", "CYS", "GLU", "GLN", "GLY", "HIS", "ILE", "LEU", "LYS", "MET", "PHE", "PRO", "SER", "THR", "TRP", "TYR", "VAL"]
+    should_continue = True
+
+ ########################################################################
     check_for_atomrec= s.index[s.str.startswith('ATOM')].tolist()
     if len(check_for_atomrec)<1:
         print(f"No atom records in this file. {file_path[-9:]} removed.")
-        return
-
+        should_continue = False
+        return should_continue
+##########################################################################
     number_of_models = sum(s.str.startswith("MODEL"))
     row_models= s.index[s.str.startswith('MODEL')].tolist()
     row_endmdls=s.index[s.str.startswith('ENDMDL')].tolist()
@@ -98,21 +106,19 @@ def rename_chains(file_path):
     new_model = None
     prev_model = None
     new_chain_id= None
-    #stepsize=numb_orig_chains
+
     open_files_dict={}
     temp_dict={}
-
     opened_files=[]
-
+###########################################################################
     print("Number of models: ", number_of_models)
     print("Chains in model 1: ", orig_chains)
 
     if number_of_models*numb_orig_chains>40:
         print("WARNING: Too many models and/or chains")
         return
-
+###########################################################################
     if number_of_models>1:
-
         curr_model = 1
         for line in model1_series: #model1 no need to change chain ids
             chain_id = line[21]
@@ -124,7 +130,18 @@ def rename_chains(file_path):
                 opened_files.append(chain_file)
                 print("Creating file "+ path_chainfile)
 
-            if line.startswith("ATOM") or line.startswith("HETATM"):
+            if line.startswith("ATOM"):
+                if line[17:20] in aminoacid_list:
+                    open_files_dict[chain_id].write(line)
+                else:
+                    print("Unknown content in residues. All subfiles from this PDB id are removed.")
+                    to_be_removed = glob.glob("/proj/wallner/users/x_karst/exjobb/files_for_naccess/"+dir+"/*")
+                    for file in to_be_removed:
+                        os.remove(file)
+                    should_continue = False
+                    return should_continue
+
+            if line.startswith("HETATM") or line.startswith("TER"):
                 open_files_dict[chain_id].write(line)
                 #print(line.strip('\n'))
 
@@ -160,14 +177,25 @@ def rename_chains(file_path):
                     opened_files.append(chain_file)
                     print("Creating file "+path_chainfile)
 
-                if line.startswith("ATOM") or line.startswith("HETATM") or line.startswith("TER"):
+                if line.startswith("ATOM"):
+                    chain_id = line[21]
+                    if line[17:20] in aminoacid_list:
+                        open_files_dict[chain_id].write(line)
+                    else:
+                        print("Unknown content in residues. All subfiles from this PDB id are removed.")
+                        to_be_removed = glob.glob("/proj/wallner/users/x_karst/exjobb/files_for_naccess/"+dir+"/*")
+                        for file in to_be_removed:
+                            os.remove(file)
+                        should_continue = False
+                        return should_continue
+
+                    #print(line.strip('\n'))
+                if line.startswith("HETATM") or line.startswith("TER"):
                     chain_id = line[21]
                     open_files_dict[chain_id].write(line)
-                    #print(line.strip('\n'))
+
 
                 previous_chain = curr_chain_id
-                #new_model = False
-
 
             print(orig_chains)
             temp_dict = {}
@@ -196,14 +224,25 @@ def rename_chains(file_path):
                 opened_files.append(chain_file)
                 print("Creating file "+ path_chainfile)
 
-            if line.startswith("ATOM") or line.startswith("HETATM"):
+            if line.startswith("ATOM"):
+                if line[17:20] in aminoacid_list:
+                    open_files_dict[chain_id].write(line)
+                else:
+                    print("Unknown content in residues. All subfiles from this PDB id are removed.")
+                    to_be_removed = glob.glob("/proj/wallner/users/x_karst/exjobb/files_for_naccess/"+dir+"/*")
+                    for file in to_be_removed:
+                        os.remove(file)
+                    should_continue = False
+                    return should_continue
+
+            if line.startswith("HETATM") or line.startswith("TER"):
                 open_files_dict[chain_id].write(line)
             #    print(line.strip('\n'))
 
         for file in opened_files:
             file.close()
 
-    return
+    return should_continue
 
 
 
@@ -267,13 +306,13 @@ def run_naccess(result_naccess_file, file_path):
 
             chain_area = float(chain_area[0])
             individual_chain_area.append(chain_area)
-            print("removing .rsa .log .asa")
+
 
             os.remove(f'/proj/wallner/users/x_karst/exjobb/{file}.rsa')
             os.remove(f'/proj/wallner/users/x_karst/exjobb/{file}.log')
             os.remove(f'/proj/wallner/users/x_karst/exjobb/{file}.asa')
 
-        print("calculating sum")
+
         sum = individual_chain_area[0] + individual_chain_area[1]
 
         path = f'/proj/wallner/users/x_karst/exjobb/files_for_naccess/{dir}/'
@@ -283,8 +322,9 @@ def run_naccess(result_naccess_file, file_path):
         parts1 = combination_tuple[0].split(".")
         parts2 = combination_tuple[1].split(".")
 
+
         combo_file = str(parts1[0])+"_"+str(parts2[0])
-        print("creating combo file")
+
         binary_file = open("/proj/wallner/users/x_karst/exjobb/"+combo_file+".pdb", "w")
 
         file1_text = file1.read()
@@ -315,8 +355,10 @@ def run_naccess(result_naccess_file, file_path):
         output_file = f"/proj/wallner/users/x_karst/exjobb/{combo_file}.rsa"
         output_file = open(output_file, "r")
         text = output_file.read()
-        print("constructing pattern")
+
         complex_areas = re.findall("CHAIN[\s]+[\d]+[\s]+[\w.]+[\s]+([\d.]+)", text)
+        print("in combo file: ", complex_areas)
+
         complex_area1 = float(complex_areas[0])
         complex_area2 = float(complex_areas[1])
         print("calculating contactarea")
@@ -370,18 +412,23 @@ def main():
 
 
     result_naccess_file = open("/proj/wallner/users/x_karst/exjobb/results_naccess/result_naccess_"+dir+".txt", "w")
+    error_file = open("all_errors_"+dir+".txt", "w")
 
     for file_path in filtered_pdb_list:
         try:
-            rename_chains(file_path)
-            run_naccess(result_naccess_file, file_path)
+            should_continue = rename_chains(file_path) #checking for other residues than amino acids
+            if should_continue:
+                run_naccess(result_naccess_file, file_path)
         except Exception as error:
-            print(error)
-            print("In "+file_path)
-            os.rename(r"/proj/wallner/users/x_karst/exjobb/results_naccess/result_naccess_"+dir+".txt",r"/proj/wallner/users/x_karst/exjobb/results_naccess/result_naccess_"+dir+"_ERROR.txt" )
-            break
+            error_file.write(str(error))
+            error_file.write(file_path)
+            error_file.write('\n')
+            #print(error)
+            #print("In "+file_path)
+            #os.rename(r"/proj/wallner/users/x_karst/exjobb/results_naccess/result_naccess_"+dir+".txt",r"/proj/wallner/users/x_karst/exjobb/results_naccess/result_naccess_"+dir+"_ERROR.txt" )
 
 
+    error_file.close()
     result_naccess_file.close()
 
 
