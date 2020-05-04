@@ -1,0 +1,1 @@
+list index out of range /proj/wallner/share/PDB/191015_biounit/n2/2n2k.pdb1

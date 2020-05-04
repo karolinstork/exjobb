@@ -1,0 +1,2 @@
+list index out of range /proj/wallner/share/PDB/191015_biounit/fk/6fkz.pdb1
+list index out of range /proj/wallner/share/PDB/191015_biounit/fk/6fky.pdb1
