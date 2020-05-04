@@ -209,6 +209,8 @@
 4enqC1.pdb1	4enqD1.pdb1	2175.7
 4enqB1.pdb1	4enqD1.pdb1	5672.15
 3eniC2.pdb2	3eniC3.pdb2	1704.7
+3eniC2.pdb2	3eniC1.pdb2	1705.05
+3eniC3.pdb2	3eniC1.pdb2	1702.0
 1en4C1.pdb2	1en4D1.pdb2	860.85
 5enyD1.pdb3	5enyC1.pdb3	1819.25
 1enoA1.pdb1	1enoA4.pdb1	901.4

@@ -240,6 +240,14 @@
 6ewbK1.pdb2	6ewbJ1.pdb2	1583.25
 6ewbK1.pdb2	6ewbC1.pdb2	2.75
 6ewbK1.pdb2	6ewbD1.pdb2	556.4
+6ewbJ1.pdb2	6ewbC1.pdb2	240.85
+6ewbJ1.pdb2	6ewbD1.pdb2	375.1
+6ewbI1.pdb2	6ewbC1.pdb2	535.8
+6ewbI1.pdb2	6ewbD1.pdb2	9.1
+6ewbI1.pdb2	6ewbG1.pdb2	1613.15
+6ewbC1.pdb2	6ewbD1.pdb2	1583.15
+6ewbC1.pdb2	6ewbG1.pdb2	380.2
+6ewbD1.pdb2	6ewbG1.pdb2	249.2
 3eweB1.pdb1	3eweA1.pdb1	1643.65
 4ew6A1.pdb1	4ew6A2.pdb1	1198.2
 4ew4B1.pdb1	4ew4C1.pdb1	501.5

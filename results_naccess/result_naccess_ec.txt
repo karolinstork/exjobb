@@ -356,6 +356,14 @@
 5ec5G1.pdb1	5ec5H1.pdb1	3209.55
 5ec5G1.pdb1	5ec5E1.pdb1	0.6
 5ec5G1.pdb1	5ec5F1.pdb1	3193.65
+5ec5I1.pdb1	5ec5H1.pdb1	3189.2
+5ec5H1.pdb1	5ec5D1.pdb1	0.05
+5ec5E1.pdb1	5ec5F1.pdb1	3192.1
+5ec5E1.pdb1	5ec5D1.pdb1	3218.5
+5ec5F1.pdb1	5ec5D1.pdb1	0.05
+5ec5D1.pdb1	5ec5B1.pdb1	0.05
+5ec5D1.pdb1	5ec5C1.pdb1	3309.2
+5ec5B1.pdb1	5ec5C1.pdb1	3240.3
 5ecmE1.pdb2	5ecmF1.pdb2	959.75
 5ecmE1.pdb2	5ecmD1.pdb2	845.2
 4ec4E1.pdb5	4ec4L1.pdb5	753.7

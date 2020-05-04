@@ -334,6 +334,15 @@
 3ehkC1.pdb1	3ehkA1.pdb1	2658.55
 3ehkC1.pdb1	3ehkD1.pdb1	271.45
 3ehkE1.pdb1	3ehkB1.pdb1	264.05
+3ehkE1.pdb1	3ehkF1.pdb1	2632.65
+3ehkE1.pdb1	3ehkA1.pdb1	8.8
+3ehkE1.pdb1	3ehkD1.pdb1	2649.6
+3ehkB1.pdb1	3ehkF1.pdb1	2568.95
+3ehkB1.pdb1	3ehkA1.pdb1	2636.4
+3ehkB1.pdb1	3ehkD1.pdb1	7.9
+3ehkF1.pdb1	3ehkA1.pdb1	269.75
+3ehkF1.pdb1	3ehkD1.pdb1	2652.95
+3ehkA1.pdb1	3ehkD1.pdb1	2572.1
 1eh9A1.pdb1	1eh9A2.pdb1	1009.95
 5ehdb1.pdb3	5ehdc1.pdb3	996.5
 5ehdb1.pdb3	5ehda1.pdb3	990.95

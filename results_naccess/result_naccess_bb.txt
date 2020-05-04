@@ -410,6 +410,17 @@
 3bbxA1.pdb1	3bbxO1.pdb1	1253.25
 3bbxA1.pdb1	3bbxY1.pdb1	109.2
 3bbxA1.pdb1	3bbxF1.pdb1	1353.25
+3bbx11.pdb1	3bbx31.pdb1	55.05
+3bbxE1.pdb1	3bbxL1.pdb1	818.65
+3bbxO1.pdb1	3bbxW1.pdb1	245.4
+3bbxO1.pdb1	3bbxF1.pdb1	11.6
+3bbxS1.pdb1	3bbxN1.pdb1	7.95
+3bbxL1.pdb1	3bbx31.pdb1	429.75
+2bbkJ1.pdb1	2bbkH1.pdb1	689.55
+2bbkJ1.pdb1	2bbkL1.pdb1	997.1
+2bbkJ1.pdb1	2bbkM1.pdb1	1592.95
+2bbkH1.pdb1	2bbkL1.pdb1	1585.05
+2bbkH1.pdb1	2bbkM1.pdb1	995.6
 3bbrA1.pdb1	3bbrB1.pdb1	763.75
 6bb0D1.pdb1	6bb0C1.pdb1	2852.45
 6bb0D1.pdb1	6bb0B1.pdb1	938.65

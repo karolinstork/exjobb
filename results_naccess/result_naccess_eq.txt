@@ -186,6 +186,9 @@
 1eqzI1.pdb1	1eqzC1.pdb1	740.9
 1eqzD1.pdb1	1eqzC1.pdb1	2518.05
 4equB1.pdb1	4equA1.pdb1	1737.25
+2eq8B1.pdb1	2eq8A1.pdb1	3776.65
+2eq8B1.pdb1	2eq8C1.pdb1	223.5
+2eq8A1.pdb1	2eq8C1.pdb1	447.95
 3eqvA2.pdb4	3eqvB1.pdb4	297.8
 3eqdA2.pdb2	3eqdA1.pdb2	133.2
 4eqhB1.pdb1	4eqhA1.pdb1	1901.55

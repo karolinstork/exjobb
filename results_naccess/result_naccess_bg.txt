@@ -1,6 +1,4 @@
 2bgcI1.pdb4	2bgcH1.pdb4	2200.7
-2bgcI1.pdb4	1bgfA1.pdb1	802.05
-2bgcH1.pdb4	1bgfA1.pdb1	1136.2
 3bg6E1.pdb2	3bg6H1.pdb2	1150.95
 3bg6E1.pdb2	3bg6G1.pdb2	448.75
 3bg6E1.pdb2	3bg6F1.pdb2	2669.55

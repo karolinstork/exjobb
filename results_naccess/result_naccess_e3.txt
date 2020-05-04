@@ -475,6 +475,14 @@
 6e3lI1.pdb1	6e3lA1.pdb1	727.1
 6e3lI1.pdb1	6e3lC1.pdb1	807.25
 6e3lI1.pdb1	6e3lB1.pdb1	1.1
+6e3lA1.pdb1	6e3lC1.pdb1	736.65
+6e3lA1.pdb1	6e3lE1.pdb1	13.6
+6e3lA1.pdb1	6e3lD1.pdb1	318.8
+6e3lA1.pdb1	6e3lB1.pdb1	3868.85
+6e3lC1.pdb1	6e3lB1.pdb1	349.75
+6e3lE1.pdb1	6e3lD1.pdb1	719.1
+6e3lE1.pdb1	6e3lB1.pdb1	744.25
+6e3lD1.pdb1	6e3lB1.pdb1	663.0
 5e34A2.pdb1	5e34B3.pdb1	275.1
 5e34A2.pdb1	5e34A3.pdb1	446.95
 5e34A2.pdb1	5e34A1.pdb1	446.95
