@@ -52,13 +52,10 @@ def count_models_chains(file):
     return numb_models_and_chains
 
 
-def convert_to_fasta(pdb_file, fasta_file):
+def convert_to_fasta(pdb_file, fasta_file, entry_list):
     #print(filtered_pdb_file+"--------------------------------------")
     fasta_seq=""
     three_to_one={"ALA":'A',"ARG":'R',"ASN":'N',"ASP":'D',"CYS":'C',"GLU":'E',"GLN":'Q',"GLY":'G',"HIS":'H',"ILE":'I',"LEU":'L',"LYS":'K',"MET":'M',"PHE":'F',"PRO":'P',"SER":'S', "THR":'T',"TRP":'W',"TYR":'Y',"VAL":'V'}
-
-
-
     file = open(pdb_file, 'r')
     s = pd.Series(file)
 
@@ -72,19 +69,18 @@ def convert_to_fasta(pdb_file, fasta_file):
     for model in models_start_end:
         chain_dict=defaultdict(list)
         model_numb = i + 1
-        print("MODEL", model_numb)
+    #    print("MODEL", model_numb)
         row_model=row_models[i]
         row_endmdl=row_endmdls[i]
 
         model=s.truncate(before=row_model+1, after=row_endmdl-1)
-    #    print(model)
 
-        #Convert chains to FASTA format
+        #Slicing out ATOM records from PDB file
         atoms = model.loc[model.str.startswith(('ATOM'), na=False)] #keep only atom records
         res_chain_pos = atoms.str.slice(start=17, stop=26) #keep only residue, chain, position
         c_alphas = res_chain_pos.drop_duplicates() #keep only c alpha
 
-
+        #Building dictionary where chain is key and (res,pos) is value
         for c_alpha in c_alphas:
             res = c_alpha[0:3]
             chain = c_alpha[4]+str(model_numb)
@@ -92,36 +88,39 @@ def convert_to_fasta(pdb_file, fasta_file):
             chain_dict[chain].append((res, pos))
 
 
-        for chain in chain_dict.keys():
-            fasta_seq=""
-            list_of_residues=[]
-            for residue_pos in chain_dict[chain]:
-                if residue_pos[0] in three_to_one:
-                    fasta_res = three_to_one[residue_pos[0]]
+        for chain in chain_dict.keys(): #translate each chain to FASTA
+            entry = pdb_file[-9:-5]+chain[:-1] #only write if not already in file
+            if entry not in entry_list:
+                entry_list.append(entry)
+                fasta_seq=""
+                list_of_residues=[]
+
+                for residue_pos in chain_dict[chain]:
+                    if residue_pos[0] in three_to_one:
+                        fasta_res = three_to_one[residue_pos[0]] #check if known residue ie amino acids
+                    else:
+                        fasta_res = 'X'
+
+                    list_of_residues.append(fasta_res)
+
+
+                if 'X' not in list_of_residues:
+                    if len(''.join(list_of_residues)) > 6:
+                        fasta_seq = ">"+pdb_file[-9:-5]+chain+pdb_file[-5:]+'\n'+ ''.join(list_of_residues)+'\n'
+                        print("Converting "+ chain+ " ...")
+                        #print("SUCCESS: File "+pdb_file[-9:-5]+chain+pdb_file[-5:]+" was converted to fasta format")
+                    else:
+                        print("WARNING: Too short sequence! File "+pdb_file[-9:-5]+chain+pdb_file[-5:]+" was removed.")
+                        fasta_seq=""
                 else:
-                    fasta_res = 'X'
+                        print("WARNING: Unknown content in sequence. File "+pdb_file[-9:-5]+chain+str(model_numb)+pdb_file[-5:]+" was removed.")
+                        fasta_seq=""
+                print(fasta_seq)
 
-                list_of_residues.append(fasta_res)
 
-
-
-            if 'X' not in list_of_residues:
-                if len(''.join(list_of_residues)) > 6:
-                    fasta_seq = ">"+pdb_file[-9:-5]+chain+pdb_file[-5:]+'\n'+ ''.join(list_of_residues)+'\n'
-                    print("Chain "+ chain+ " converted")
-                    #print("SUCCESS: File "+pdb_file[-9:-5]+chain+pdb_file[-5:]+" was converted to fasta format")
-                else:
-                    print("WARNING: Too short sequence! File "+pdb_file[-9:-5]+chain+pdb_file[-5:]+" was removed.")
-                    fasta_seq=""
             else:
-                    print("WARNING: Unknown content in sequence. File "+pdb_file[-9:-5]+chain+str(model_numb)+pdb_file[-5:]+" was removed.")
-                    fasta_seq=""
-            print(fasta_seq)
-
-            fasta_file.write(fasta_seq)
-
-            i = i + 1
-
+                print("WARNING:", entry, "already exists in FASTA file!", pdb_file[-9:-5]+chain, "will not be added." )
+        i = i + 1
 
     return
 
@@ -134,24 +133,27 @@ def main():
 
     list_of_files = find_pdbfiles(dir_name)
 
+
     fasta_file=open("fasta_file_0506.txt", "w")
-    x=0
+    entry_list = []
+#    x=0
+
     for file in list_of_files:
-        x = x+1
+        #x = x+1
         try:
             numb_models_and_chains = count_models_chains(file)
-            print("----------------------------------------------------")
-            print(file, numb_models_and_chains)
+
             if numb_models_and_chains != (1,1.0):
-                print(file, " converting to fasta")
-                convert_to_fasta(file, fasta_file)
+                print("----------------------------------------------------")
+                print(file, "Number of models and chains:" ,numb_models_and_chains)
+                convert_to_fasta(file, fasta_file, entry_list) #måste entry list skickas ut igen eller spars allt i dennu tills nästa varv i loopen? 
 
         except Exception as error:
             print(error)
             print(file)
 
-        if x == 20 :
-            break
+        #if x == 100 :
+        #    break
 
 
 
