@@ -1,5 +1,0 @@
-216dA1.pdb1	216dA2.pdb1	351.4
-116dA2.pdb1	116dA1.pdb1	609.7
-316dB1.pdb1	316dC1.pdb1	182.25
-316dB1.pdb1	316dA1.pdb1	366.9
-316dC1.pdb1	316dA1.pdb1	188.0

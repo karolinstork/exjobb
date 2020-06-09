@@ -1,4 +1,0 @@
-280dA1.pdb1	280dB1.pdb1	599.4
-180dB1.pdb1	180dA1.pdb1	325.85
-380dB1.pdb1	380dA1.pdb1	220.75
-280dD1.pdb2	280dC1.pdb2	588.9

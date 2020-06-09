@@ -58,18 +58,14 @@
 3tp4A1.pdb3	3tp4B1.pdb3	772.9
 5tp1S1.pdb4	5tp1D1.pdb4	679.1
 1tpwB1.pdb1	1tpwA1.pdb1	1625.85
-5tprA1.pdb1	5tprB1.pdb1	3426.75
+5tprA1.pdb1	5tprB1.pdb1	3434.55
 4tpjC1.pdb2	4tpjB1.pdb2	261.45
 4tpzA1.pdb1	4tpzD1.pdb1	776.15
-5tpyA3.pdb1	5tpyA1.pdb1	525.0
-5tpyA3.pdb1	5tpyA4.pdb1	719.9
-5tpyA1.pdb1	5tpyA2.pdb1	719.9
-5tpyA2.pdb1	5tpyA4.pdb1	525.0
 4tpmA3.pdb1	4tpmA2.pdb1	667.85
 4tpmA3.pdb1	4tpmA1.pdb1	668.0
 4tpmA2.pdb1	4tpmA1.pdb1	667.95
 1tph11.pdb1	1tph21.pdb1	1637.45
-4tprL1.pdb1	4tprH1.pdb1	1795.5
+4tprL1.pdb1	4tprH1.pdb1	1768.9
 5tpaA1.pdb1	5tpaB1.pdb1	1054.8
 1tpdA1.pdb1	1tpdA2.pdb1	1495.9
 4tpiI2.pdb2	4tpiZ3.pdb2	184.85
@@ -94,9 +90,9 @@
 4tpiI4.pdb2	4tpiZ1.pdb2	184.9
 1tpvB1.pdb1	1tpvA1.pdb1	1612.05
 1tpuB1.pdb1	1tpuA1.pdb1	1578.05
-3tpcG3.pdb2	3tpcE3.pdb2	1772.0
-3tpcG3.pdb2	3tpcH2.pdb2	8.95
-3tpcG3.pdb2	3tpcF1.pdb2	1292.45
+3tpcG3.pdb2	3tpcE3.pdb2	1771.95
+3tpcG3.pdb2	3tpcH2.pdb2	8.9
+3tpcG3.pdb2	3tpcF1.pdb2	1292.4
 3tpcE3.pdb2	3tpcH2.pdb2	1282.15
 3tpcE3.pdb2	3tpcF1.pdb2	14.55
 3tpcH2.pdb2	3tpcF1.pdb2	1835.7
@@ -110,7 +106,7 @@
 3tpiZ1.pdb1	3tpiI1.pdb1	711.4
 1tpc11.pdb1	1tpc21.pdb1	1614.7
 5tpmD1.pdb2	5tpmC1.pdb2	693.2
-5tppL1.pdb1	5tppH1.pdb1	1652.75
+5tppL1.pdb1	5tppH1.pdb1	1624.75
 1tp5A1.pdb1	1tp5B1.pdb1	478.9
 1tp8B1.pdb7	1tp8C1.pdb7	406.2
 1tp8B1.pdb7	1tp8D1.pdb7	31.95
@@ -178,7 +174,7 @@
 1tp8F1.pdb5	1tp8H1.pdb5	35.9
 1tp8H1.pdb5	1tp8C1.pdb5	300.0
 1tpfA1.pdb1	1tpfB1.pdb1	1513.55
-5tpiA2.pdb1	5tpiA1.pdb1	1198.5
+5tpiA2.pdb1	5tpiA1.pdb1	1222.0
 3tpuB1.pdb1	3tpuA1.pdb1	1997.45
 3tpuB1.pdb1	3tpuI1.pdb1	425.2
 3tpuB1.pdb1	3tpuJ1.pdb1	243.1
@@ -260,7 +256,7 @@
 3tpiI1.pdb3	3tpiZ1.pdb3	711.45
 3tpiI1.pdb3	3tpiI2.pdb3	9.5
 3tpiZ1.pdb3	3tpiI2.pdb3	363.4
-1tp2A1.pdb1	1tp2B1.pdb1	558.85
+1tp2A1.pdb1	1tp2B1.pdb1	646.05
 4tptA1.pdb1	4tptB1.pdb1	2255.2
 3tpqM1.pdb1	3tpqC1.pdb1	685.85
 3tpqM1.pdb1	3tpqD1.pdb1	1031.05
@@ -282,5 +278,5 @@
 2tpiI1.pdb1	2tpiZ1.pdb1	710.15
 4tpgE1.pdb1	4tpgA1.pdb1	256.7
 5tpvB1.pdb1	5tpvA1.pdb1	1762.3
-4tpzB1.pdb2	4tpzC1.pdb2	791.95
+4tpzB1.pdb2	4tpzC1.pdb2	791.9
 5tphB1.pdb1	5tphA1.pdb1	963.7

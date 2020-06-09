@@ -1,4 +1,0 @@
-250dC1.pdb2	250dD1.pdb2	397.9
-250dB1.pdb1	250dA1.pdb1	401.9
-150dB1.pdb1	150dA1.pdb1	546.2
-250dE1.pdb3	250dF1.pdb3	396.5

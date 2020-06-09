@@ -2,8 +2,8 @@
 3vnyA2.pdb3	3vnyA1.pdb3	1058.15
 3vnyA2.pdb3	3vnyA3.pdb3	441.75
 3vnyA2.pdb3	3vnyA4.pdb3	24.5
-3vnyA1.pdb3	3vnyA3.pdb3	24.5
-3vnyA1.pdb3	3vnyA4.pdb3	441.75
+3vnyA1.pdb3	3vnyA3.pdb3	24.4
+3vnyA1.pdb3	3vnyA4.pdb3	441.7
 3vnyA3.pdb3	3vnyA4.pdb3	1058.15
 2vnyA1.pdb1	2vnyI1.pdb1	992.2
 5vnoB1.pdb1	5vnoA1.pdb1	898.1
@@ -102,9 +102,6 @@
 5vnhB1.pdb1	5vnhC1.pdb1	686.65
 5vnhB1.pdb1	5vnhA1.pdb1	880.15
 5vnhC1.pdb1	5vnhA1.pdb1	373.4
-3vnuA1.pdb1	3vnuT1.pdb1	525.75
-3vnuA1.pdb1	3vnuG1.pdb1	596.35
-3vnuT1.pdb1	3vnuG1.pdb1	319.5
 5vn0A1.pdb1	5vn0B1.pdb1	2762.9
 2vn5A1.pdb1	2vn5B1.pdb1	757.5
 5vndB1.pdb3	5vndA1.pdb3	659.9
@@ -135,15 +132,15 @@
 5vniB1.pdb1	5vniA1.pdb1	936.35
 5vn5A1.pdb1	5vn5B2.pdb1	36.4
 5vn5A1.pdb1	5vn5C2.pdb1	83.7
-5vn5A1.pdb1	5vn5B1.pdb1	2244.3
-5vn5A1.pdb1	5vn5C1.pdb1	919.5
-5vn5A2.pdb1	5vn5B2.pdb1	2244.35
-5vn5A2.pdb1	5vn5C2.pdb1	919.5
+5vn5A1.pdb1	5vn5B1.pdb1	2255.7
+5vn5A1.pdb1	5vn5C1.pdb1	915.35
+5vn5A2.pdb1	5vn5B2.pdb1	2255.75
+5vn5A2.pdb1	5vn5C2.pdb1	915.35
 5vn5A2.pdb1	5vn5B1.pdb1	36.45
 5vn5A2.pdb1	5vn5C1.pdb1	83.7
 5vn5B2.pdb1	5vn5C2.pdb1	26.2
-5vn5B2.pdb1	5vn5B1.pdb1	933.4
-5vn5C2.pdb1	5vn5C1.pdb1	2215.0
+5vn5B2.pdb1	5vn5B1.pdb1	933.45
+5vn5C2.pdb1	5vn5C1.pdb1	2214.9
 5vn5B1.pdb1	5vn5C1.pdb1	26.2
 3vnjA1.pdb1	3vnjB1.pdb1	570.85
 3vnjA1.pdb1	3vnjC1.pdb1	162.3
@@ -151,7 +148,7 @@
 3vnjB1.pdb1	3vnjC1.pdb1	1427.3
 3vnjB1.pdb1	3vnjD1.pdb1	173.6
 3vnjC1.pdb1	3vnjD1.pdb1	558.1
-2vnfD1.pdb2	2vnfC1.pdb2	596.65
+2vnfD1.pdb2	2vnfC1.pdb2	613.75
 5vncC1.pdb1	5vncB1.pdb1	421.65
 5vncC1.pdb1	5vncA1.pdb1	712.95
 5vncC1.pdb1	5vncD1.pdb1	1592.3
@@ -167,7 +164,7 @@
 5vnzA2.pdb1	5vnzC2.pdb1	334.75
 5vnzC1.pdb1	5vnzA1.pdb1	334.75
 5vnzA1.pdb1	5vnzC2.pdb1	176.2
-2vnvA1.pdb1	2vnvB1.pdb1	1468.3
+2vnvA1.pdb1	2vnvB1.pdb1	1462.4
 5vnwA1.pdb1	5vnwD1.pdb1	483.4
 2vnsA1.pdb1	2vnsB1.pdb1	705.95
 3vncA1.pdb1	3vncB1.pdb1	1034.95
@@ -184,7 +181,7 @@
 5vnnC1.pdb1	5vnnA1.pdb1	424.7
 5vnnC1.pdb1	5vnnB1.pdb1	722.05
 5vnnA1.pdb1	5vnnB1.pdb1	910.0
-2vnvE2.pdb3	2vnvE1.pdb3	1449.7
+2vnvE2.pdb3	2vnvE1.pdb3	1466.9
 3vnyA1.pdb2	3vnyA2.pdb2	1058.15
 5vnjA1.pdb1	5vnjB1.pdb1	916.5
 5vnjA1.pdb1	5vnjC1.pdb1	430.3
@@ -201,6 +198,11 @@
 3vnfA2.pdb2	3vnfA1.pdb2	905.55
 3vnzA1.pdb2	3vnzA2.pdb2	1057.8
 2vn2A2.pdb1	2vn2C1.pdb1	227.4
+2vn2A2.pdb1	2vn2A1.pdb1	937.8
+2vn2A2.pdb1	2vn2C2.pdb1	1684.35
+2vn2C1.pdb1	2vn2A1.pdb1	1684.35
+2vn2C1.pdb1	2vn2C2.pdb1	787.8
+2vn2A1.pdb1	2vn2C2.pdb1	227.4
 3vniD1.pdb1	3vniA1.pdb1	1400.25
 3vniD1.pdb1	3vniC1.pdb1	544.6
 3vniD1.pdb1	3vniB1.pdb1	169.7
@@ -264,10 +266,7 @@
 5vnlB1.pdb2	5vnlC1.pdb2	732.5
 5vnlB1.pdb2	5vnlA1.pdb2	954.2
 5vnlC1.pdb2	5vnlA1.pdb2	427.8
-3vnvA1.pdb1	3vnvT1.pdb1	710.55
-3vnvA1.pdb1	3vnvG1.pdb1	690.7
-3vnvT1.pdb1	3vnvG1.pdb1	349.35
-3vn0A1.pdb1	3vn0B1.pdb1	1176.0
+3vn0A1.pdb1	3vn0B1.pdb1	1176.05
 2vncB2.pdb1	2vncA1.pdb1	276.0
 2vncB2.pdb1	2vncB1.pdb1	1197.25
 2vncB2.pdb1	2vncA2.pdb1	1418.05
@@ -275,7 +274,6 @@
 2vncA1.pdb1	2vncA2.pdb1	1255.3
 2vncB1.pdb1	2vncA2.pdb1	276.05
 2vnfB1.pdb1	2vnfA1.pdb1	418.95
-2vnuD1.pdb1	2vnuB1.pdb1	1541.75
 1vncA2.pdb2	1vncA1.pdb2	850.05
 1vncA2.pdb2	1vncA3.pdb2	850.0
 1vncA1.pdb2	1vncA3.pdb2	850.05
@@ -286,7 +284,7 @@
 2vn2B2.pdb2	2vn2D1.pdb2	221.85
 2vn2D2.pdb2	2vn2D1.pdb2	811.0
 3vn0C1.pdb2	3vn0D1.pdb2	1165.2
-2vnzX2.pdb1	2vnzX1.pdb1	835.55
+2vnzX2.pdb1	2vnzX1.pdb1	798.65
 5vn0G1.pdb4	5vn0H1.pdb4	2738.2
 5vn0E1.pdb3	5vn0F1.pdb3	2740.2
 5vnmB1.pdb1	5vnmC1.pdb1	734.15
@@ -294,7 +292,7 @@
 5vnmC1.pdb1	5vnmA1.pdb1	370.65
 5vnbD1.pdb4	5vnbK1.pdb4	265.15
 3vneA1.pdb2	3vneA2.pdb2	881.7
-5vn2A1.pdb1	5vn2B1.pdb1	1430.65
+5vn2A1.pdb1	5vn2B1.pdb1	1430.6
 5vn2A1.pdb1	5vn2D1.pdb1	523.7
 5vn2A1.pdb1	5vn2C1.pdb1	1528.65
 5vn2B1.pdb1	5vn2D1.pdb1	1506.5
@@ -305,5 +303,5 @@
 5vnfB1.pdb1	5vnfD1.pdb1	362.2
 5vnfB1.pdb1	5vnfA1.pdb1	913.5
 5vn0C1.pdb2	5vn0D1.pdb2	2754.5
-2vnvD1.pdb2	2vnvC1.pdb2	1438.25
-5vn4B1.pdb1	5vn4A1.pdb1	2657.25
+2vnvD1.pdb2	2vnvC1.pdb2	1454.0
+5vn4B1.pdb1	5vn4A1.pdb1	2659.2

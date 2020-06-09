@@ -1,3 +1,0 @@
-240dB1.pdb1	240dA1.pdb1	544.4
-440dA1.pdb1	440dB1.pdb1	484.05
-340dA1.pdb1	340dA2.pdb1	410.0

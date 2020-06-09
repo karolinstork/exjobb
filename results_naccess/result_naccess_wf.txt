@@ -1,6 +1,6 @@
 2wfdA1.pdb1	2wfdB1.pdb1	1062.6
 5wfoN1.pdb1	5wfoQ1.pdb1	1473.2
-5wfoN1.pdb1	5wfoR1.pdb1	1602.15
+5wfoN1.pdb1	5wfoR1.pdb1	1610.9
 3wf2A1.pdb1	3wf2D1.pdb1	877.35
 3wf1C1.pdb2	3wf1B1.pdb2	870.8
 4wf7C1.pdb2	4wf7B1.pdb2	1507.15
@@ -32,15 +32,15 @@
 5wfgE1.pdb2	5wfgD1.pdb2	424.7
 5wfnB1.pdb2	5wfnD1.pdb2	2286.75
 3wf4D1.pdb1	3wf4A1.pdb1	873.55
-4wf5A1.pdb1	4wf5B1.pdb1	656.25
+4wf5A1.pdb1	4wf5B1.pdb1	661.0
 3wfjA1.pdb1	3wfjE1.pdb1	1040.75
 3wfxA1.pdb1	3wfxB1.pdb1	2613.2
 3wfvA2.pdb1	3wfvA1.pdb1	1393.9
 3wfvA2.pdb1	3wfvA3.pdb1	1393.9
 3wfvA1.pdb1	3wfvA3.pdb1	1393.85
 3wfjD1.pdb4	3wfjF1.pdb4	1034.45
-2wfjA1.pdb1	2wfjB1.pdb1	43.0
-3wfhA1.pdb1	3wfhB1.pdb1	1661.45
+2wfjA1.pdb1	2wfjB1.pdb1	43.05
+3wfhA1.pdb1	3wfhB1.pdb1	1663.2
 3wfjB1.pdb2	3wfjG1.pdb2	1037.2
 4wfdF1.pdb2	4wfdD1.pdb2	202.1
 4wfdF1.pdb2	4wfdE1.pdb2	317.8
@@ -72,7 +72,7 @@
 5wfrN1.pdb1	5wfrR1.pdb1	1643.5
 2wfyE1.pdb1	2wfyB1.pdb1	353.85
 2wfyB1.pdb1	2wfyA1.pdb1	1647.0
-3wfzD1.pdb2	3wfzC1.pdb2	3284.45
+3wfzD1.pdb2	3wfzC1.pdb2	3284.5
 5wfvA1.pdb1	5wfvP1.pdb1	493.05
 3wf8A2.pdb2	3wf8A1.pdb2	993.45
 3wf3A1.pdb1	3wf3D1.pdb1	887.25
@@ -89,7 +89,7 @@
 3wfbB1.pdb1	3wfbC1.pdb1	3320.3
 2wfcC1.pdb2	2wfcB1.pdb2	686.8
 2wfuA1.pdb1	2wfuB1.pdb1	651.9
-4wf4B1.pdb1	4wf4A1.pdb1	816.9
+4wf4B1.pdb1	4wf4A1.pdb1	839.05
 5wf9A4.pdb1	5wf9A1.pdb1	615.95
 5wf9A4.pdb1	5wf9A2.pdb1	615.95
 5wf9A1.pdb1	5wf9A3.pdb1	615.95
@@ -133,7 +133,7 @@
 4wfgD1.pdb1	4wfgA1.pdb1	240.8
 4wfgD1.pdb1	4wfgB1.pdb1	82.2
 4wfgF1.pdb1	4wfgA1.pdb1	30.6
-4wfgF1.pdb1	4wfgG1.pdb1	1653.75
+4wfgF1.pdb1	4wfgG1.pdb1	1653.7
 4wfgF1.pdb1	4wfgB1.pdb1	260.2
 4wfgE1.pdb1	4wfgA1.pdb1	452.05
 4wfgE1.pdb1	4wfgG1.pdb1	78.7

@@ -1,6 +1,0 @@
-443dB1.pdb1	443dA1.pdb1	569.75
-243dA2.pdb1	243dA1.pdb1	387.5
-343dC1.pdb2	343dD1.pdb2	277.05
-343dA1.pdb1	343dB1.pdb1	275.9
-343dH1.pdb4	343dG1.pdb4	274.3
-343dF1.pdb3	343dE1.pdb3	275.1

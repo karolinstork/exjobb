@@ -1,4 +1,0 @@
-414dC1.pdb2	414dD1.pdb2	504.95
-114dB1.pdb1	114dA1.pdb1	557.2
-314dB1.pdb1	314dA1.pdb1	340.8
-414dB1.pdb1	414dA1.pdb1	500.6

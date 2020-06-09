@@ -1,5 +1,0 @@
-398dB1.pdb1	398dA1.pdb1	384.5
-298dB1.pdb1	298dA1.pdb1	570.9
-198dB1.pdb1	198dA1.pdb1	286.35
-198dD1.pdb2	198dC1.pdb2	286.4
-398dC1.pdb2	398dD1.pdb2	388.8

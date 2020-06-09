@@ -1,4 +1,1 @@
 148lS1.pdb1	148lE1.pdb1	123.0
-448dB1.pdb1	448dA1.pdb1	573.0
-248dA1.pdb1	248dA2.pdb1	481.4
-348dA2.pdb1	348dA1.pdb1	475.9

@@ -1,3 +1,0 @@
-396dA1.pdb1	396dA2.pdb1	500.3
-196dA1.pdb1	196dB1.pdb1	450.7
-296dB1.pdb1	296dA1.pdb1	558.05

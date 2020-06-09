@@ -1,3 +1,1 @@
-456dB1.pdb1	456dA1.pdb1	561.2
-256dA1.pdb1	256dB1.pdb1	290.3
 456cB1.pdb1	456cA1.pdb1	260.5

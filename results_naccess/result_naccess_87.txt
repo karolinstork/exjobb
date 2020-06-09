@@ -1,3 +1,1 @@
 487dK1.pdb1	487dI1.pdb1	18.05
-187dA1.pdb1	187dA2.pdb1	426.4
-287dB1.pdb1	287dA1.pdb1	598.3
