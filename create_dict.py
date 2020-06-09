@@ -6,33 +6,40 @@ from collections import defaultdict
 
 
 
-def create_dict(file):
-    open_file = open(file, "r")
+def create_dict(cluster_file):
+    open_file = open(cluster_file, "r")
     lines = open_file.readlines()
 
-    cluster_dict = {}
-    file_dict=defaultdict(list)
+    cluster_dict = defaultdict(list)
+    file_dict={}
     i=0
 
     for line in lines:
+
+
+        if line[:3] =="pdb": #one row with header info
+            continue
+
+
         line = line.strip('\n')
-        i = i + 1
-
-        print("on row number: ", i)
-        files_list = line.split(" ")
-
-        filtered_list = [file for file in files_list if file != ""]
-        cluster_dict[i]=filtered_list #clusternumber gives all file in that cluster. whole file name: xxxxA.pdb1
-
-        for file in files_list:
-            pdb_id = file.split(".")[0]
-            file_dict[pdb_id] = i #file as key gives which row it is on 
 
 
+        file_and_cluster=line.split('\t')
+        file = file_and_cluster[0]
+        file_chain = (file.split(".")[0])[:5] #1ix2A
+        cluster = int(file_and_cluster[1])
+        file_dict[file_chain] = cluster
 
-    pickle.dump(file_dict, open("pdbfile_clusters_dict.p", "wb"))
+        print(file_chain)
+        print(cluster)
 
-    pickle.dump(cluster_dict, open("cluster_files_dict.p", "wb"))
+        cluster_dict[cluster].append(file_chain)
+
+
+
+    pickle.dump(file_dict, open("pickles/file_cluster_dict.p", "wb"))
+
+    pickle.dump(cluster_dict, open("pickles/cluster_files_dict.p", "wb"))
 
 
     return
@@ -53,9 +60,9 @@ def create_dict(file):
 
 def main():
     args = sys.argv[1:]
-    file = args[0]
+    cluster_file = args[0]
 
-    create_dict(file)
+    create_dict(cluster_file)
 
 
 
