@@ -98,6 +98,7 @@ def rename_chains(file_path):
     model1_start = (models_start_end[0])[0]+1
     model1_end = (models_start_end[0])[1]
     model1_series=s[model1_start:model1_end]
+    #print(model1_series)
 
     orig_chains = list(model1_series.str.get(21).unique())
     numb_orig_chains = len(orig_chains)
@@ -132,6 +133,7 @@ def rename_chains(file_path):
 
             if line.startswith("ATOM"):
                 if line[17:20] in aminoacid_list:
+                    #print(line)
                     open_files_dict[chain_id].write(line)
                 else:
                     print("Unknown content in residues. All subfiles from this PDB id are removed.")
@@ -180,6 +182,7 @@ def rename_chains(file_path):
                 if line.startswith("ATOM"):
                     chain_id = line[21]
                     if line[17:20] in aminoacid_list:
+                        #print(line)
                         open_files_dict[chain_id].write(line)
                     else:
                         print("Unknown content in residues. All subfiles from this PDB id are removed.")
@@ -192,6 +195,7 @@ def rename_chains(file_path):
                     #print(line.strip('\n'))
                 if line.startswith("HETATM") or line.startswith("TER"):
                     chain_id = line[21]
+                    #print(line)
                     open_files_dict[chain_id].write(line)
 
 
@@ -226,6 +230,7 @@ def rename_chains(file_path):
 
             if line.startswith("ATOM"):
                 if line[17:20] in aminoacid_list:
+                    #print(line)
                     open_files_dict[chain_id].write(line)
                 else:
                     print("Unknown content in residues. All subfiles from this PDB id are removed.")
@@ -237,7 +242,7 @@ def rename_chains(file_path):
 
             if line.startswith("HETATM") or line.startswith("TER"):
                 open_files_dict[chain_id].write(line)
-            #    print(line.strip('\n'))
+                #print(line.strip('\n'))
 
         for file in opened_files:
             file.close()
@@ -286,7 +291,8 @@ def run_naccess(result_naccess_file, file_path):
         for file in combination_tuple: #each chain area for themselves
             target_file=f'/proj/wallner/users/x_karst/exjobb/files_for_naccess/{dir}/{file}'
             try:
-                subprocess.run(["/proj/wallner/users/x_bjowa/local/naccess/./naccess", target_file, "-h"], timeout = 10)
+                subprocess.run(["/proj/wallner/users/x_bjowa/local/naccess/./naccess_alt_loc_fix", target_file, "-h"], timeout = 10)
+                #subprocess.run(["/proj/wallner/users/x_bjowa/local/naccess/./naccess", target_file, "-h"], timeout = 10)
             except subprocess.TimeoutExpired:
                 print("Time limit exceeded for ", file)
                 files_to_be_removed = glob.glob("/proj/wallner/users/x_karst/exjobb/files_for_naccess/"+dir+"/*")
@@ -337,7 +343,8 @@ def run_naccess(result_naccess_file, file_path):
         binary_file.close()
 
         try:
-            subprocess.run(["/proj/wallner/users/x_bjowa/local/naccess/./naccess", f"/proj/wallner/users/x_karst/exjobb/{combo_file}.pdb", "-h"], timeout = 10)
+            subprocess.run(["/proj/wallner/users/x_bjowa/local/naccess/./naccess_alt_loc_fix", f"/proj/wallner/users/x_karst/exjobb/{combo_file}.pdb", "-h"], timeout = 10)
+            #subprocess.run(["/proj/wallner/users/x_bjowa/local/naccess/./naccess", f"/proj/wallner/users/x_karst/exjobb/{combo_file}.pdb", "-h"], timeout = 10)
         except subprocess.TimeoutExpired:
             print("Time limit exceeded for binary_file.pdb")
             files_to_be_removed = glob.glob("/proj/wallner/users/x_karst/exjobb/files_for_naccess/"+dir+"/*")
@@ -374,6 +381,7 @@ def run_naccess(result_naccess_file, file_path):
 
             result = f'{input_file1}\t{input_file2}\t{size_contactarea}\n'
             result_naccess_file.write(result)
+            print(result)
 
         os.remove(f"/proj/wallner/users/x_karst/exjobb/{combo_file}.rsa")
         os.remove(f"/proj/wallner/users/x_karst/exjobb/{combo_file}.log")
@@ -400,6 +408,8 @@ def main():
     filtered_pdb_list=[]
 
 
+
+
     for file in list_of_files:
         try:
             numb_models_and_chains = count_models_chains(file)
@@ -412,23 +422,33 @@ def main():
 
 
     result_naccess_file = open("/proj/wallner/users/x_karst/exjobb/results_naccess/result_naccess_"+dir+".txt", "w")
-    error_file = open("all_errors_"+dir+".txt", "w")
+
+
+    #filtered_pdb_list=["/proj/wallner/share/PDB/191015_biounit/ix/5ix7.pdb1", "/proj/wallner/share/PDB/191015_biounit/tg/5tgp.pdb1"] test with DNA containing files
 
     for file_path in filtered_pdb_list:
+        error_file = None
         try:
-            should_continue = rename_chains(file_path) #checking for other residues than amino acids
-            if should_continue:
+            should_continue = rename_chains(file_path)
+            if should_continue:  #checking for other residues than amino acids
                 run_naccess(result_naccess_file, file_path)
         except Exception as error:
+            error_file = open("errors_naccess/all_errors_"+dir+".txt", "w")
+            print(error)
             error_file.write(str(error))
-            error_file.write(file_path)
+            error_file.write(" "+file_path)
             error_file.write('\n')
+            to_be_removed = glob.glob("/proj/wallner/users/x_karst/exjobb/files_for_naccess/"+dir+"/*")
+
+            for file in to_be_removed:
+                os.remove(file)
             #print(error)
             #print("In "+file_path)
             #os.rename(r"/proj/wallner/users/x_karst/exjobb/results_naccess/result_naccess_"+dir+".txt",r"/proj/wallner/users/x_karst/exjobb/results_naccess/result_naccess_"+dir+"_ERROR.txt" )
 
+    if error_file != None:
+        error_file.close()
 
-    error_file.close()
     result_naccess_file.close()
 
 
