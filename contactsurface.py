@@ -14,6 +14,7 @@ import subprocess
 import string
 import itertools
 import glob
+import traceback
 
 
 
@@ -38,7 +39,7 @@ def find_pdbfiles(dir_name):
 
 
 def count_models_chains(file):
-    pdb_id=file[-8:]
+    pdb_id=file[-8:] #only temp name
     parser=Bio.PDB.PDBParser(PERMISSIVE=1)
     structure = parser.get_structure(pdb_id, file)
 
@@ -73,6 +74,7 @@ def create_path_chain(file_path, chain_id, curr_model):
 
 
 def rename_chains(file_path):
+
     print(file_path[-9:] + "-----------------------------------")
     file = open(file_path, 'r')
     s = pd.Series(file)
@@ -84,8 +86,8 @@ def rename_chains(file_path):
     should_continue = True
 
  ########################################################################
-    check_for_atomrec= s.index[s.str.startswith('ATOM')].tolist()
-    if len(check_for_atomrec)<1:
+    rows_with_atomrec= s.index[s.str.startswith('ATOM')].tolist()
+    if len(rows_with_atomrec)<1:
         print(f"No atom records in this file. {file_path[-9:]} removed.")
         should_continue = False
         return should_continue
@@ -100,7 +102,7 @@ def rename_chains(file_path):
     model1_series=s[model1_start:model1_end]
     #print(model1_series)
 
-    orig_chains = list(model1_series.str.get(21).unique())
+    orig_chains = list(model1_series.str.get(21).unique()) #also gets chains with only HETATM
     numb_orig_chains = len(orig_chains)
 
     previous_chain = None
@@ -117,18 +119,21 @@ def rename_chains(file_path):
 
     if number_of_models*numb_orig_chains>40:
         print("WARNING: Too many models and/or chains")
-        return
-###########################################################################
+        should_continue = False
+        return should_continue
+########################################################################### >1 MODEL
     if number_of_models>1:
         curr_model = 1
         for line in model1_series: #model1 no need to change chain ids
             chain_id = line[21]
+            print(line)
             path_chainfile = create_path_chain(file_path, chain_id, curr_model)
 
-            if not os.path.exists(path_chainfile) and not line.startswith("ANISOU"):
+            if not os.path.exists(path_chainfile) and (line.startswith("ATOM") or line.startswith("HETATM")): #create chain-file if it doesn't exist
+                print(path_chainfile)
                 chain_file = open(path_chainfile, "w")
                 open_files_dict[chain_id] = chain_file
-                opened_files.append(chain_file)
+                opened_files.append(chain_file) #remember which chain files are open to be written to
                 print("Creating file "+ path_chainfile)
 
             if line.startswith("ATOM"):
@@ -137,7 +142,7 @@ def rename_chains(file_path):
                     open_files_dict[chain_id].write(line)
                 else:
                     print("Unknown content in residues. All subfiles from this PDB id are removed.")
-                    to_be_removed = glob.glob("/proj/wallner/users/x_karst/exjobb/files_for_naccess/"+dir+"/*")
+                    to_be_removed = glob.glob("/proj/wallner/users/x_karst/exjobb/files_for_naccess/"+dir+"/*") #If unknown content, all chains from this file will be removed
                     for file in to_be_removed:
                         os.remove(file)
                     should_continue = False
@@ -148,9 +153,11 @@ def rename_chains(file_path):
                 #print(line.strip('\n'))
 
         for file in opened_files:
-            file.close()
+            file.close() #close all chain files
 
-        for i in range(1,len(models_start_end)): #rest of models, change chain ids
+            #############################################################################################
+
+        for i in range(1,len(models_start_end)): #rest of models, change chain ids!
             new_model = True
             curr_model=i+1
 
@@ -161,6 +168,7 @@ def rename_chains(file_path):
             model_series = s[model_start:model_end]
 
             for line in model_series: #renaming chains
+                print(line)
                 curr_chain_id = line[21]
                 if curr_chain_id in temp_dict:
                     new_chain_id = temp_dict[curr_chain_id]
@@ -173,7 +181,7 @@ def rename_chains(file_path):
                 line= line[:21]+ new_chain_id+line[22:]
                 chain_id = new_chain_id
 
-                if not os.path.exists(path_chainfile) and not line.startswith("ANISOU"):
+                if not os.path.exists(path_chainfile) and (line.startswith("ATOM") or line.startswith("HETATM")):
                     chain_file = open(path_chainfile, "w")
                     open_files_dict[chain_id] = chain_file
                     opened_files.append(chain_file)
@@ -207,7 +215,7 @@ def rename_chains(file_path):
             for file in opened_files:
                 file.close()
 
-
+############################################################################################################## 1 MODEL ONLY
 
     if number_of_models<=1:  #no need to change chain ids
         curr_model = 1
@@ -222,7 +230,7 @@ def rename_chains(file_path):
             chain_id = line[21]
             path_chainfile = create_path_chain(file_path, chain_id, curr_model)
 
-            if not os.path.exists(path_chainfile) and not line.startswith("ANISOU"):
+            if not os.path.exists(path_chainfile) and (line.startswith("ATOM") or line.startswith("HETATM")):
                 chain_file = open(path_chainfile, "w")
                 open_files_dict[chain_id] = chain_file
                 opened_files.append(chain_file)
@@ -281,6 +289,25 @@ def run_naccess(result_naccess_file, file_path):
     if len(list_of_files)==0:
         return
 
+    for file in list_of_files: #check if a chain file ONLY contains hetatm records
+        only_hetatm= True
+        path = "/proj/wallner/users/x_karst/exjobb/files_for_naccess/"+dir+"/"+ file
+        file = open(path, "r")
+        lines = file.readlines()
+        for line in lines:
+            print(line)
+            if line[:4] == "ATOM":
+                only_hetatm = False
+        file.close()
+        if only_hetatm:
+            print("only hetatm")
+            os.remove(path)
+
+
+    list_of_files=os.listdir("/proj/wallner/users/x_karst/exjobb/files_for_naccess/"+dir)
+
+
+
     combination_of_files= itertools.combinations(list_of_files, 2)
     combinations_list = list(combination_of_files)
     print("Doing binary comparisons . . . ")
@@ -296,8 +323,13 @@ def run_naccess(result_naccess_file, file_path):
             except subprocess.TimeoutExpired:
                 print("Time limit exceeded for ", file)
                 files_to_be_removed = glob.glob("/proj/wallner/users/x_karst/exjobb/files_for_naccess/"+dir+"/*")
+
                 for f in files_to_be_removed:
                     os.remove(f)
+
+                os.remove(f'/proj/wallner/users/x_karst/exjobb/{file}.rsa')
+                os.remove(f'/proj/wallner/users/x_karst/exjobb/{file}.log')
+                os.remove(f'/proj/wallner/users/x_karst/exjobb/{file}.asa')
 
                 return
 
@@ -402,11 +434,12 @@ def run_naccess(result_naccess_file, file_path):
 def main():
     args = sys.argv[1:]
     dir_name = args[0]
+    dir_name = dir_name.rstrip("/")
     dir = dir_name[-2:]
+
 
     list_of_files = find_pdbfiles(dir_name)
     filtered_pdb_list=[]
-
 
 
 
@@ -432,7 +465,9 @@ def main():
             should_continue = rename_chains(file_path)
             if should_continue:  #checking for other residues than amino acids
                 run_naccess(result_naccess_file, file_path)
+
         except Exception as error:
+            error = traceback.format_exc()
             error_file = open("errors_naccess/all_errors_"+dir+".txt", "w")
             print(error)
             error_file.write(str(error))
@@ -442,6 +477,8 @@ def main():
 
             for file in to_be_removed:
                 os.remove(file)
+
+
             #print(error)
             #print("In "+file_path)
             #os.rename(r"/proj/wallner/users/x_karst/exjobb/results_naccess/result_naccess_"+dir+".txt",r"/proj/wallner/users/x_karst/exjobb/results_naccess/result_naccess_"+dir+"_ERROR.txt" )
