@@ -16,8 +16,9 @@ import seaborn as sns
 
 
 
-def find_all_contacts(complex, res_dict, composition_dict, check):
+def find_all_contacts(complex, res_dict, composition_dict, check, one_model, within_model, between_models):
     translation_dict = {}
+
 
     line = complex.strip('\n')
     files = line.split('\t')
@@ -35,6 +36,7 @@ def find_all_contacts(complex, res_dict, composition_dict, check):
 
     only_1_model = False
     numb_of_models = 0
+    new_chain_name = None
 
     pdbfile = open(f"/proj/wallner/share/PDB/191015_biounit/{dir}/{base_file}", "r")
     textlines_pdbfile = pdbfile.readlines()
@@ -45,30 +47,30 @@ def find_all_contacts(complex, res_dict, composition_dict, check):
     if numb_of_models == 1:
         check = check +1
         complex = complex.strip('\n')
-
         print("----------------", complex, "------------------")
 
         output_file = open(f"/proj/wallner/users/x_karst/exjobb/c_script_output/{pdb_id}_{chain_1}_{chain_2}.output", "w")
         target = f'/proj/wallner/share/PDB/191015_biounit/{dir}/{base_file}'
         subprocess.run(["/proj/wallner/users/x_bjowa/git/pdb_codes/contact-maps/./contact_map_chain", target, "-chains", chain_1[0], chain_2[0], "-c", "6", "-cb"], stdout = output_file)
         output_file.close()
+        one_model = one_model + 1
+
 
 
     if numb_of_models >1:
         complex = complex.strip('\n')
         print("----------------", complex, "------------------")
-        different_models = many_models_find_contacts(complex)
-        if different_models:
-            print("Interactions between different models in", complex)
-            return check
+        new_chain_name, within_model, between_models = many_models_find_contacts(complex, within_model, between_models)
         check = check + 1
 
 
-    output_read = open(f"/proj/wallner/users/x_karst/exjobb/c_script_output/{pdb_id}_{chain_1}_{chain_2}.output", "r")
+    if new_chain_name== None:
+        output_read = open(f"/proj/wallner/users/x_karst/exjobb/c_script_output/{pdb_id}_{chain_1}_{chain_2}.output", "r")
+    else:
+        output_read = open(f"/proj/wallner/users/x_karst/exjobb/c_script_output/{pdb_id}_{chain_1}_{chain_2}_{new_chain_name}.output", "r")
 
     text = output_read.read()
     lines = text.split('\n')
-
 
 
     for line in lines: #translation_dict
@@ -79,7 +81,6 @@ def find_all_contacts(complex, res_dict, composition_dict, check):
             chain = (line_split_by_space[4]).strip(":")
             pos_chain = pos+chain
             translation_dict[pos_chain] = res
-
 
 
     for line in lines:
@@ -109,13 +110,14 @@ def find_all_contacts(complex, res_dict, composition_dict, check):
                     #    print("Inter-chain contact with ",res ,"found:", contact, "=", contact_residue)
 
 
+    output_read.close()
 
 
 
-    return check
+    return check, one_model, within_model, between_models
 
 
-def many_models_find_contacts(complex):
+def many_models_find_contacts(complex, within_model, between_models):
     different_models = False
     line = complex.strip('\n')
     files = line.split('\t')
@@ -136,14 +138,18 @@ def many_models_find_contacts(complex):
     ##################################################################################################
     file = open(file_path, 'r')
     s = pd.Series(file)
+    temp_dict = {}
 
     number_of_models = sum(s.str.startswith("MODEL"))
     row_models= s.index[s.str.startswith('MODEL')].tolist()
     row_endmdls=s.index[s.str.startswith('ENDMDL')].tolist()
     models_start_end= list((zip(row_models, row_endmdls)))
 
+
     model_chain1 = chain_1[1:] #2
     model_chain2 = chain_2[1:]
+
+    new_chain_name = None
 
     if model_chain1 == model_chain2:
         model_numb = int(model_chain1) - 1
@@ -159,13 +165,65 @@ def many_models_find_contacts(complex):
         target = f'/proj/wallner/users/x_karst/exjobb/c_script_temp/{pdb_id}_{chain_1}_{chain_2}.{filetype}'
         subprocess.run(["/proj/wallner/users/x_bjowa/git/pdb_codes/contact-maps/./contact_map_chain", target, "-chains", chain_1[0], chain_2[0], "-c", "6", "-cb"], stdout = output_file)
         output_file.close()
+        within_model = within_model + 1
 
     else:
-        different_models = True
+        #write first model to temp file
+        between_models = between_models + 1
+        model_numb = int(model_chain1) - 1
+        model_start = (models_start_end[model_numb])[0] +1 #atom records
+        model_end = (models_start_end[model_numb])[1] #last row of atom (or hetatm) records
+        model_series = s[model_start:model_end]
+        orig_chains = list(model_series.str.get(21).unique())
+        print(orig_chains)
+        temp_file = open(f'/proj/wallner/users/x_karst/exjobb/c_script_temp/{pdb_id}_{chain_1}_{chain_2}.{filetype}', "w")
+        for line in model_series:
+            #print(line,)
+            temp_file.write(line)
+
+
+        #change chain id:s in second model and write to temp file
+        model_numb = int(model_chain2) - 1 #find list index for model
+        model_start = (models_start_end[model_numb])[0] +1 #atom records
+        model_end = (models_start_end[model_numb])[1] #last row of atom (or hetatm) records
+        model_series = s[model_start:model_end]
+
+        for line in model_series:
+            curr_chain_id = line[21]
+            if curr_chain_id in temp_dict:
+                new_chain_id = temp_dict[curr_chain_id]
+            else:
+                new_chain_id = next_available(curr_chain_id, orig_chains)
+                temp_dict[curr_chain_id] = new_chain_id
+                orig_chains.append(new_chain_id)
+
+            line= line[:21]+ new_chain_id+line[22:]
+            temp_file.write(line)
+
+        new_chain_name = temp_dict[chain_2[0]]
+        print(new_chain_name)
+
+        temp_file.close()
+
+
+        output_file = open(f"/proj/wallner/users/x_karst/exjobb/c_script_output/{pdb_id}_{chain_1}_{chain_2}_{new_chain_name}.output", "w")
+        target = f'/proj/wallner/share/PDB/191015_biounit/{dir}/{base_file}'
+        subprocess.run(["/proj/wallner/users/x_bjowa/git/pdb_codes/contact-maps/./contact_map_chain", target, "-chains", chain_1[0], new_chain_name, "-c", "6", "-cb"], stdout = output_file)
+        output_file.close()
 
 
 
-    return different_models
+    return new_chain_name, within_model, between_models
+
+
+def next_available(curr_chain_id, orig_chains):
+    stepsize= 1
+    while curr_chain_id in orig_chains or curr_chain_id.isalpha() == False:
+        curr_chain_id= chr(ord(curr_chain_id)+stepsize)
+
+    new_chain_id = curr_chain_id
+
+    return new_chain_id
 
 
 
@@ -231,6 +289,36 @@ def plot_heatmap(res_dict, check):
 
 
 
+def calc_normalized_contacts(res_dict, check):
+    norm_dict = defaultdict(dict)
+    numb_all_interactions = {}
+    res_dict = dict(res_dict)
+
+    for master_residue, small_dict in res_dict.items():
+        all_interactions = sum(small_dict.values())
+        numb_all_interactions[master_residue] = all_interactions
+        #print(all_interactions)
+    for master_residue, small_dict in res_dict.items():
+        for mini_residue, number in small_dict.items():
+            normalized_number_contacts = number/(numb_all_interactions[master_residue]+numb_all_interactions[mini_residue])
+            norm_dict[master_residue][mini_residue] =normalized_number_contacts
+
+    print(norm_dict)
+    df = pd.DataFrame(norm_dict)
+
+    df = df.sort_index(0, ascending=False)
+    df = df.sort_index(1)
+    print(df)
+
+    title = "Normalized interactions in "+ str(check)+ " complexes"
+    heatmap = sns.heatmap(df, linewidth = 0.5, cmap = "Blues").set_title(title)
+
+    import matplotlib.pyplot as plt
+    plt.show()
+
+
+
+    return
 
 
 
@@ -244,26 +332,46 @@ def main():
     res_dict = defaultdict(Counter)
     composition_dict = defaultdict(Counter)
 
+    one_model = 0
+    within_model = 0
+    between_models = 0
+    error_files = 0
+
     check = 0
 
     for complex in complexes:
         try:
-            check = find_all_contacts(complex, res_dict, composition_dict, check)
+            check, one_model, within_model, between_models = find_all_contacts(complex, res_dict, composition_dict, check, one_model, within_model, between_models)
         except KeyError:
             print("KeyError in ", complex)
+            error_files = error_files + 1
 
 
-        if check == 100:
+        if check == 18710:
             print(res_dict)
+            print("Only one model: ", one_model)
+            print("Interactions within same model but more models exist: ", within_model)
+            print("Interactions between models: ", between_models )
             #plot_heatmap(res_dict, check)
             #calc_composition(composition_dict, check)
+            calc_normalized_contacts(res_dict, check)
+            dataset_file.close()
 
             return
 
+    # print(res_dict)
+    # print("Only one model: ", one_model)
+    # print("Interactions within same model but more models exist: ", within_model)
+    # print("Interactions between models: ", between_models )
+    # print("Error files: ", error_files) # 11 st
+    # #plot_heatmap(res_dict, check)
+    # #calc_composition(composition_dict, check)
+    # dataset_file.close()
+    #
+    # calc_normalized_contacts(res_dict)
 
 
 
-    dataset_file.close()
 
 
 
