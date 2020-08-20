@@ -97,9 +97,10 @@ def find_all_contacts(complex, res_dict, composition_counter, check, one_model, 
             string_pos = string_pos + 1
 
 
-    contact_with_anything_across = None
+
 
     for line in lines:
+        contact_with_anything_across = None
         if line[:3] == "RES":
             line_split_by_space = line.split()
             pos = (line_split_by_space[2])
@@ -110,8 +111,8 @@ def find_all_contacts(complex, res_dict, composition_counter, check, one_model, 
             all_contacts_in_string = re.findall(pattern, line) #list with length 1, all distances as a string
             list_of_distances = all_contacts_in_string[0].split() #distances in string format in list
 
-
             column = 0
+
             for distance in list_of_distances:
                 distance = float(distance)
                 if distance < cut_off:
@@ -121,7 +122,6 @@ def find_all_contacts(complex, res_dict, composition_counter, check, one_model, 
                     if position_chain_id[-1] != chain: #only intrested in interactions between two different chains
                         number_of_contacts_between_chains = number_of_contacts_between_chains + 1
                         print(res, pos+chain, "is in contact with", contact_res, "at", position_chain_id, "Distance: ", distance)
-
                         contact_residue = translation_dict[position_chain_id]
                         res_dict[res].update(contact_residue)
                         contact_with_anything_across = True
@@ -132,7 +132,7 @@ def find_all_contacts(complex, res_dict, composition_counter, check, one_model, 
 
                 column = column + 1
 
-        if contact_with_anything_across = True: #if residue is closer than 6Å to anything across interface, add to counter
+        if contact_with_anything_across == True: #if residue is closer than 6Å to anything across interface, add to counter
             composition_counter.update(res)
 
 
@@ -356,22 +356,21 @@ def plot_normalized_contacts_and_likelihood(res_dict, check, fraction_dict):
     import matplotlib.pyplot as plt
     plt.show()
 
-
-    likelihood_dict = defaultdict(dict)
+#########################################################################################################
+    residue_order = ["R", "K", "N", "D", "Q", "E", "H", "P", "Y", "W", "S", "T", "G", "A", "M", "C", "F", "L", "V", "I"] # to sort the same way the article did
+    likelihood_dict = OrderedDict({key: OrderedDict({key: None for key in residue_order}) for key in residue_order})
 
     for master_residue, small_dict in normalized_dict.items():
-        for mini_residue, number in small_dict.items():
+        for mini_residue, number in small_dict.items(): #why number?
             w_i = fraction_dict[master_residue]
             w_j = fraction_dict[mini_residue]
             q_ij = normalized_dict[master_residue][mini_residue]
-
             likelihood = 10 * (math.log(q_ij/(w_i * w_j)))
-
             likelihood_dict[master_residue][mini_residue] = likelihood
 
     df_2 = pd.DataFrame(likelihood_dict)
-    df_2 = df_2.sort_index(0, ascending=False)
-    df_2 = df_2.sort_index(1)
+#    df_2 = df_2.sort_index(0, ascending=False)
+#    df_2 = df_2.sort_index(1)
     print("Likelihood")
     print(df_2)
 
@@ -383,12 +382,10 @@ def plot_normalized_contacts_and_likelihood(res_dict, check, fraction_dict):
 
     ###########################################
     volume_dict = {"I": 166.1, "F":189.7, "V":138.8, "L":168.0 , "W":227.9, "M":165.2, "A":87.8, "G":59.9, "C":105.4, "Y":191.2, "P":123.3, "T":118.3, "S":91.7, "H":156.3, "E":140.9, "N":120.1, "Q":145.1, "D":115.4, "K":172.7, "R":188.2}
-    residue_order = ["R", "K", "N", "D", "Q", "E", "H", "P", "Y", "W", "S", "T", "G", "A", "M", "C", "F", "L", "V", "I"] # to sort the same way the article did
-    opposite_order = ["I", "V", "L", "F", "C", "M", "A", "G", "T", "S", "W", "Y", "P", "H", "E", "Q", "D", "N", "K", "R"] # to have the graph symmetric
+#    opposite_order = ["I", "V", "L", "F", "C", "M", "A", "G", "T", "S", "W", "Y", "P", "H", "E", "Q", "D", "N", "K", "R"] # to have the graph symmetric
 
     normalized_volume_dict = defaultdict(dict)
     likelihood_volume_dict = OrderedDict({key: OrderedDict({key: None for key in residue_order}) for key in residue_order})
-    #likelihood_volume_dict = defaultdict(dict)
     sum_of_contacts_times_volume = 0 #sum(Ckl * Vk * Vl)
 
     for master_residue, small_dict in res_dict.items(): #calculate fixed denominator
@@ -415,16 +412,11 @@ def plot_normalized_contacts_and_likelihood(res_dict, check, fraction_dict):
 
 
 
-    #ordered_likelihood_volume_dict = OrderedDict(sorted(likelihood_volume_dict.items(), key = lambda i:residue_order.index(i[0])))
+
     print(likelihood_volume_dict)
-
-
-
     df_3 = pd.DataFrame(likelihood_volume_dict)
-    #df_3 = df_3.sort_index(0, key = lambda i:residue_order.index(i[0]))
-    #df_3 = df_3.sort_index(1)
-
     print(df_3)
+
 
     title_3 = "Likelihood of interaction Gij(v) based on "+ str(check)+" complexes"
 
