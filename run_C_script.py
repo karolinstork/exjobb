@@ -332,12 +332,19 @@ def plot_normalized_contacts_and_likelihood(res_dict, check, fraction_dict):
     numb_all_interactions = {}
     res_dict = dict(res_dict)
     tot_numb_interactions = 0
+    tot_numb_interactions_dict = {}
 
     for master_residue, small_dict in res_dict.items():
-        all_interactions_with_master_residue = sum(small_dict.values())
-        numb_all_interactions[master_residue] = all_interactions_with_master_residue
-        tot_numb_interactions = tot_numb_interactions + all_interactions_with_master_residue
+        all_interactions_with_master_residue  = 0
+        for mini_res, contacts in small_dict.items():
+            if mini_res == master_residue:
+                all_interactions_with_master_residue = all_interactions_with_master_residue + contacts
+            else:
+                all_interactions_with_master_residue = all_interactions_with_master_residue + (contacts/2)
+        tot_numb_interactions_dict[master_residue] = all_interactions_with_master_residue
+    tot_numb_interactions= sum(tot_numb_interactions_dict.values())
         #print(all_interactions)
+
     for master_residue, small_dict in res_dict.items():
         for mini_residue, number in small_dict.items():
             normalized_number_contacts = number/tot_numb_interactions
