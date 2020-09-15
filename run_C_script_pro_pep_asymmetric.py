@@ -470,7 +470,7 @@ def plot_normalized_contacts_and_likelihood(pro_interface_dict, pep_interface_di
     plt.savefig("/proj/wallner/users/x_karst/exjobb/pictures/gij_pro_pep_asymmetric.png", bbox_inches='tight')
     plt.show()
 
-    ########################################### Likelihood Gij(v) (ej klar)
+    ########################################### Likelihood Gij(v) 
     volume_dict = {"I": 166.1, "F":189.7, "V":138.8, "L":168.0 , "W":227.9, "M":165.2, "A":87.8, "G":59.9, "C":105.4, "Y":191.2, "P":123.3, "T":118.3, "S":91.7, "H":156.3, "E":140.9, "N":120.1, "Q":145.1, "D":115.4, "K":172.7, "R":188.2}
 
 
