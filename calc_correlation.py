@@ -11,39 +11,66 @@ import seaborn as sns
 
 
 def calc_mean(data_1, data_2):
-    df_1 = pd.read_csv(data_1)
-    df_2 = pd.read_csv(data_2)
-    print(type(df_1))
 
-    print(df_1)
-    print(df_2)
+    if "pro" in data_1 or data_2: #works for pro vs pep and pro vs whole database
+        print("whole database vs protein protein")
+        df_1 = pd.read_csv(data_1)
+        df_2 = pd.read_csv(data_2)
+
+        if "pro" not in data_1:
+            del df_1['Unnamed: 0']
+        if "pro" not in data_2:
+            del df_2['Unnamed: 0']
+
+        upper_tri1 = df_1.where(np.tril(np.ones(df_1.shape), 0).astype(bool)).stack()
+        upper_tri2 = df_2.where(np.tril(np.ones(df_2.shape), 0).astype(bool)).stack()
+
+        print(upper_tri1)
+        print(upper_tri2)
+
+        arr1 = upper_tri1.to_numpy()
+        arr2 = upper_tri2.to_numpy()
+
+        print(arr1)
+        print(arr2)
+        print(arr1.shape)
+        print(arr2.shape)
 
 
-    #heatmap = sns.heatmap(df, linewidth = 0.5, cmap = "Blues").set_title(title)
+        similarity_matrix = np.corrcoef(arr1, arr2)
+        print(similarity_matrix)
 
 
-    array_1 = df_1.to_numpy()
-    array_2 = df_2.to_numpy()
 
 
-    array_1 = np.delete(array_1, 0, axis = 1)
-    array_1 = array_1.astype(float)
-    array_2 = np.delete(array_2, 0, axis = 1)
-    array_2 = array_2.astype(float)
+    else: #comparing glaser and my results with the whole database
+
+        df_1 = pd.read_csv(data_1) #my first results
+        df_2 = pd.read_csv(data_2)
+
+        del df_1['Unnamed: 0'] #removing letters
+        del df_2['Unnamed: 0']
+
+        print(df_1)
+        print(df_2)
+
+        upper_tri1 = df_1.where(np.tril(np.ones(df_1.shape), 0).astype(bool)).stack()
+        upper_tri2 = df_2.where(np.tril(np.ones(df_2.shape), 0).astype(bool)).stack()
+
+        print(upper_tri1)
+        print(upper_tri2)
+
+        arr1 = upper_tri1.to_numpy()
+        arr2 = upper_tri2.to_numpy()
+
+        print(arr1)
+        print(arr2)
+        print(arr1.shape)
+        print(arr2.shape)
 
 
-    m1 = np.asmatrix(array_1)
-    m2 = np.asmatrix(array_2)
-
-    v1 = m1.flatten()
-    v2 = m2.flatten()
-
-    print(v1)
-    print(v2)
-    print(np.shape(v1))
-
-    similarity_matrix = np.corrcoef(v1, v2)
-    print(similarity_matrix)
+        similarity_matrix = np.corrcoef(arr1, arr2)
+        print(similarity_matrix)
 
 
 
@@ -61,7 +88,7 @@ def main():
 
     try:
         args = sys.argv[1:]
-        data_1 = args[0] #my results
+        data_1 = args[0]
         data_2 = args[1]
 
     except IndexError:
