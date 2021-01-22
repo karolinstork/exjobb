@@ -1,0 +1,3 @@
+2lr1B1.pdb1	2lr1A1.pdb1
+6fadA1.pdb1	6fadE1.pdb1
+4utqZ1.pdb1	4utqA1.pdb1
