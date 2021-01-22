@@ -25,11 +25,11 @@ def main():
   # print(diff)
 
 
-  plt.scatter(x, y_propro, s = 20, color = "C1")
-  plt.plot(x, y_propro, label = "Protein protein (16286 complexes)", color = "C1")
+  plt.scatter(x, y_propro, s = 20, color = "C0")
+  plt.plot(x, y_propro, label = "Protein protein (16286 complexes)", color = "C0")
 
-  plt.scatter(x, y_propep, s = 20, color= "C0")
-  plt.plot(x, y_propep, label = "Protein peptide (1397 complexes)", color = "C0")
+  plt.scatter(x, y_propep, s = 20, color= "C1")
+  plt.plot(x, y_propep, label = "Protein peptide (1397 complexes)", color = "C1")
   plt.xlabel("Residues")
   plt.ylabel("Wi [%]")
   plt.ylim(0,12)

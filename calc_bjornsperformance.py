@@ -15,7 +15,7 @@ import csv
 
 def find_targets():
     targets_list = []
-    for (dir_path, dirnames, filenames) in walk(f"/proj/wallner/users/x_karst/exjobb/evaluate_scoring_matrix/pro_pro/bjorns"):
+    for (dir_path, dirnames, filenames) in walk(f"/proj/wallner/users/x_karst/exjobb/evaluate_scoring_matrix/propro_matrix/bjorns"):
         for file in filenames:
             if file[-4:] != ".txt":
                 target_path = dir_path+"/"+file
@@ -151,60 +151,27 @@ def calc_performance(sorted_pqd, sorted_pqdz, sorted_zrank):
 
     ####################################################################################
 
-
-    if correct_1_pqd_080>0:
-        pqd_target_accurate_top1 = True
-    else:
-        pqd_target_accurate_top1 = None
-
-    if correct_1_pqdz_080>0:
-        pqdz_target_accurate_top1 = True
-    else:
-        pqdz_target_accurate_top1 = None
-
-    if correct_1_zrank_080>0:
-        zrank_target_accurate_top1 = True
-    else:
-        zrank_target_accurate_top1 = None
+    pqd_023 = (correct_1_pqd_023, correct_10_pqd_023, correct_100_pqd_023)
+    pqd_049 = (correct_1_pqd_049, correct_10_pqd_049, correct_100_pqd_049)
+    pqd_080 = (correct_1_pqd_080, correct_10_pqd_080, correct_100_pqd_080)
 
 
+    pqdz_023 = (correct_1_pqdz_023, correct_10_pqdz_023, correct_100_pqdz_023)
+    pqdz_049 = (correct_1_pqdz_049, correct_10_pqdz_049, correct_100_pqdz_049)
+    pqdz_080 = (correct_1_pqdz_080, correct_10_pqdz_080, correct_100_pqdz_080)
 
-    if correct_10_pqd_080>0:
-        pqd_target_accurate_top10 = True
-    else:
-        pqd_target_accurate_top10 = None
-
-    if correct_10_pqdz_080>0:
-        pqdz_target_accurate_top10 = True
-    else:
-        pqdz_target_accurate_top10 = None
-
-    if correct_10_zrank_080>0:
-        zrank_target_accurate_top10 = True
-    else:
-        zrank_target_accurate_top10 = None
+    zrank_023 = (correct_1_zrank_023, correct_10_zrank_023, correct_100_zrank_023)
+    zrank_049 = (correct_1_zrank_049, correct_10_zrank_049, correct_100_zrank_049)
+    zrank_080 = (correct_1_zrank_080, correct_10_zrank_080, correct_100_zrank_080)
 
 
 
 
-    if correct_100_pqd_080>0:
-        pqd_target_accurate_top100 = True
-    else:
-        pqd_target_accurate_top100 = None
-
-    if correct_100_pqdz_080>0:
-        pqdz_target_accurate_top100 = True
-    else:
-        pqdz_target_accurate_top100 = None
-
-    if correct_100_zrank_080>0:
-        zrank_target_accurate_top100 = True
-    else:
-        zrank_target_accurate_top100 = None
 
 
 
-    return pqd_target_accurate_top1, pqdz_target_accurate_top1, zrank_target_accurate_top1, pqd_target_accurate_top10, pqdz_target_accurate_top10, zrank_target_accurate_top10, pqd_target_accurate_top100, pqdz_target_accurate_top100, zrank_target_accurate_top100
+
+    return pqd_023, pqd_049, pqd_080, pqdz_023, pqdz_049, pqdz_080, zrank_023, zrank_049, zrank_080
 
 
 
@@ -212,9 +179,9 @@ def calc_performance(sorted_pqd, sorted_pqdz, sorted_zrank):
 
 
 def check_pickledict(model, correct_023, correct_049, correct_080): #checks if model is a correct model according to all three benchmarks
-    correct_models_023 = pickle.load(open("/proj/wallner/users/x_karst/exjobb/evaluate_scoring_matrix/pro_pro/dockq_natives_0.23.p", "rb"))
-    correct_models_049 = pickle.load(open("/proj/wallner/users/x_karst/exjobb/evaluate_scoring_matrix/pro_pro/dockq_natives_0.49.p", "rb"))
-    correct_models_080 = pickle.load(open("/proj/wallner/users/x_karst/exjobb/evaluate_scoring_matrix/pro_pro/dockq_natives_0.8.p", "rb"))
+    correct_models_023 = pickle.load(open("/proj/wallner/users/x_karst/exjobb/evaluate_scoring_matrix/propro_matrix/dockq_natives_0.23.p", "rb"))
+    correct_models_049 = pickle.load(open("/proj/wallner/users/x_karst/exjobb/evaluate_scoring_matrix/propro_matrix/dockq_natives_0.49.p", "rb"))
+    correct_models_080 = pickle.load(open("/proj/wallner/users/x_karst/exjobb/evaluate_scoring_matrix/propro_matrix/dockq_natives_0.8.p", "rb"))
 
     model_name = (model.split()[0])
 
@@ -235,49 +202,80 @@ def check_pickledict(model, correct_023, correct_049, correct_080): #checks if m
 
 
 
-def plot_performance(succeded_predictions_pqd_top1, succeded_predictions_pqdz_top1, succeded_predictions_zrank_top1, succeded_predictions_pqd_top10, succeded_predictions_pqdz_top10, succeded_predictions_zrank_top10, succeded_predictions_pqd_top100, succeded_predictions_pqdz_top100, succeded_predictions_zrank_top100):
+def plot_performance(pqd_targets023, pqd_targets049, pqd_targets080, pqdz_targets023, pqdz_targets049, pqdz_targets080, zrank_targets023, zrank_targets049, zrank_targets080):
 
-    top1 = [succeded_predictions_pqd_top1, succeded_predictions_pqdz_top1, succeded_predictions_zrank_top1, 1]
-    top10 = [succeded_predictions_pqd_top10, succeded_predictions_pqdz_top10, succeded_predictions_zrank_top10, 2]
-    top100 = succeded_predictions_pqd_top100, succeded_predictions_pqdz_top100, succeded_predictions_zrank_top100, 5]
-    bars4 = top1+top10+top100
+    top1_023 = [pqd_targets023[0], pqdz_targets023[0], zrank_targets023[0], 6, 6]
+    top10_023 = [pqd_targets023[1], pqdz_targets023[1], zrank_targets023[1], 26, 24]
+    top100_023 = [pqd_targets023[2], pqdz_targets023[2], zrank_targets023[2], 62, 70]
 
-    x_list = ["ProQDock", "ProQDockZ", "ZRANK", "Scoring matrix"]
+    top1_049 = [pqd_targets049[0], pqdz_targets049[0], zrank_targets049[0], 3, 2]
+    top10_049 = [pqd_targets049[1], pqdz_targets049[1], zrank_targets049[1], 12, 12]
+    top100_049 = [pqd_targets049[2], pqdz_targets049[2], zrank_targets049[2], 33, 37]
 
-    r = np.arange(len(top1))
-    barWidth = 0.25
-    r1 = list(np.arange(len(top1)))
+    top1_080 = [pqd_targets080[0], pqdz_targets080[0], zrank_targets080[0], 1, 1]
+    top10_080 = [pqd_targets080[1], pqdz_targets080[1], zrank_targets080[1], 3, 2]
+    top100_080 = [pqd_targets080[2], pqdz_targets080[2], zrank_targets080[2], 5, 5]
+
+
+
+
+    bars10 = top1_023 + top10_023 + top100_023 + top1_049 + top10_049 + top100_049 + top1_080 + top10_080 + top100_080
+
+    x_list = ["ProQDock", "ProQDockZ", "ZRANK", "Glaser matrix", "True propro matrix"]
+    #x_list = ["Scoring matrix", "Glaser scoring matrix"]
+
+
+    barWidth = 0.08 #0.1
+
+    r1 = list(np.arange(len(top1_023)))
+    print(r1)
     r2 = [x + barWidth for x in r1]
     r3 = [x + barWidth for x in r2]
-    r4 = r1+r2+r3
+    r4 = [x + barWidth for x in r3]
+    r5 = [x + barWidth for x in r4]
+    r6 = [x + barWidth for x in r5]
+    r7 = [x + barWidth for x in r6]
+    r8 = [x + barWidth for x in r7]
+    r9 = [x + barWidth for x in r8]
 
-    print(r1)
-    print(r2)
-    print(r3)
-    print(r4)
-
-    plt.bar(r1, top1, color='#FFD435', edgecolor='white', width=barWidth, label = "Top1 hits")
-    plt.bar(r2, top10, color='#FF9735', edgecolor='white', width=barWidth, label = "Top10 hits")
-    plt.bar(r3, top100, color='#FC84B5', edgecolor='white', width=barWidth, label = "Top100 hits")
+    r10 = r1+r2+r3+r4+r5+r6+r7+r8+r9
 
 
-    plt.ylim((0,124))
-
-
-    label = [succeded_predictions_pqd_top1, succeded_predictions_pqdz_top1, succeded_predictions_zrank_top1, 1, succeded_predictions_pqd_top10, succeded_predictions_pqdz_top10, succeded_predictions_zrank_top10, 2, succeded_predictions_pqd_top100, succeded_predictions_pqdz_top100, succeded_predictions_zrank_top100, 5]
-    print(label)
-
-    for i in range(len(r4)):
-        plt.text(x = r4[i]-0.03, y = bars4[i]+0.5, s = label[i], size = 8)
+    plt.figure(figsize = (9.4, 6.0), dpi = 190) #9.4, 6.0
 
 
 
-    plt.xticks([r + barWidth for r in range(len(x_list))], x_list)
-    plt.xlabel("Methods")
-    plt.title(f'Performance on 124 targets', fontweight='bold')
-    plt.ylabel('Number of targets with >=1 high quality model hits')
+    plt.bar(r1, top1_023, color='#FECD1C', edgecolor='white', width=barWidth, label = "Acceptable top 1")
+    plt.bar(r2, top10_023, color='#FFDC5D', edgecolor='white', width=barWidth, label = "Acceptable top 10")
+    plt.bar(r3, top100_023, color='#FFE99A', edgecolor='white', width=barWidth, label = "Acceptable top 100")
+
+    plt.bar(r4, top1_049, color='#FF7D00', edgecolor='white', width=barWidth, label = "Medium top 1")
+    plt.bar(r5, top10_049, color='#FF9735', edgecolor='white', width=barWidth, label = "Medium top 10")
+    plt.bar(r6, top100_049, color='#FCB775', edgecolor='white', width=barWidth, label = "Medium top 100")
+
+    plt.bar(r7, top1_080, color='#FF62A2', edgecolor='white', width=barWidth, label = "High top 1")
+    plt.bar(r8, top10_080, color='#FC84B5', edgecolor='white', width=barWidth, label = "High top 10")
+    plt.bar(r9, top100_080, color='#FFC7DE', edgecolor='white', width=barWidth, label = "High top 100")
+
+
+    plt.ylim((0,134))
+
+
+    labels = list(top1_023 + top10_023 + top100_023 + top1_049 + top10_049 + top100_049 + top1_080 + top10_080 + top100_080)
+
+
+    for i in range(len(r10)):
+        plt.text(x = r10[i]-0.03, y = bars10[i]+0.5, s = labels[i], size = 6)
+
+
+
+    plt.xticks(r5, x_list)
+
+    plt.xlabel("Methods", fontweight = "bold")
+    plt.title(f'Performance on 124 targets with 3 DockQ quality benchmarks', fontweight='bold')
+    plt.ylabel('Number of targets with >=1 model hits', fontweight = "bold")
     plt.tight_layout()
-    plt.legend()
+    plt.legend(fontsize = "small")
     plt.savefig(f"/proj/wallner/users/x_karst/exjobb/pictures/bjorns_performance_CnM.png")
     plt.show()
     plt.clf()
@@ -293,82 +291,115 @@ def main():
     args = sys.argv[1:]
     targets_list = find_targets()
 
-    succeded_predictions_pqd_top1 = 0
-    succeded_predictions_pqdz_top1 = 0
-    succeded_predictions_zrank_top1 = 0
 
-    succeded_predictions_pqd_top10 = 0
-    succeded_predictions_pqdz_top10 = 0
-    succeded_predictions_zrank_top10 = 0
+    pqd_targets023 = [0, 0, 0]
+    pqd_targets049 = [0, 0, 0]
+    pqd_targets080 = [0, 0, 0]
 
-    succeded_predictions_pqd_top100 = 0
-    succeded_predictions_pqdz_top100 = 0
-    succeded_predictions_zrank_top100 = 0
+    pqdz_targets023 = [0, 0, 0]
+    pqdz_targets049 = [0, 0, 0]
+    pqdz_targets080 = [0, 0, 0]
 
+    zrank_targets023 = [0, 0, 0]
+    zrank_targets049 = [0, 0, 0]
+    zrank_targets080 = [0, 0, 0]
 
     tot_targets = 0
 
     for target in targets_list:
         tot_targets = tot_targets + 1
         print(target)
+
         sorted_pqd, sorted_pqdz, sorted_zrank = sort_file(target)
-        pqd_target_accurate_top1, pqdz_target_accurate_top1, zrank_target_accurate_top1, pqd_target_accurate_top10, pqdz_target_accurate_top10, zrank_target_accurate_top10, pqd_target_accurate_top100, pqdz_target_accurate_top100, zrank_target_accurate_top100 = calc_performance(sorted_pqd, sorted_pqdz, sorted_zrank)
+        pqd_023, pqd_049, pqd_080, pqdz_023, pqdz_049, pqdz_080, zrank_023, zrank_049, zrank_080 = calc_performance(sorted_pqd, sorted_pqdz, sorted_zrank)
 
-################################################################################### Top1
-        if pqd_target_accurate_top1 == True:
-            succeded_predictions_pqd_top1 = succeded_predictions_pqd_top1 + 1
 
-        if pqdz_target_accurate_top1 == True:
-            succeded_predictions_pqdz_top1 = succeded_predictions_pqdz_top1 + 1
 
-        if zrank_target_accurate_top1 == True:
-            succeded_predictions_zrank_top1 = succeded_predictions_zrank_top1 + 1
-######################################################################################Top10
+        if int(pqd_023[0])>0:
+            pqd_targets023[0] = pqd_targets023[0] + 1
+        if int(pqd_023[1])>0:
+            pqd_targets023[1] = pqd_targets023[1] + 1
+        if int(pqd_023[2])>0:
+            pqd_targets023[2] = pqd_targets023[2] + 1
+        if int(pqd_049[0])>0:
+            pqd_targets049[0] = pqd_targets049[0] + 1
+        if int(pqd_049[1])>0:
+            pqd_targets049[1] = pqd_targets049[1] + 1
+        if int(pqd_049[2])>0:
+            pqd_targets049[2] = pqd_targets049[2] + 1
+        if int(pqd_080[0])>0:
+            pqd_targets080[0] = pqd_targets080[0] + 1
+        if int(pqd_080[1])>0:
+            pqd_targets080[1] = pqd_targets080[1] + 1
+        if int(pqd_080[2])>0:
+            pqd_targets080[2] = pqd_targets080[2] + 1
 
-        if pqd_target_accurate_top10 == True:
-            succeded_predictions_pqd_top10 = succeded_predictions_pqd_top10 + 1
+        if int(pqdz_023[0])>0:
+            pqdz_targets023[0] = pqdz_targets023[0] + 1
+        if int(pqdz_023[1])>0:
+            pqdz_targets023[1] = pqdz_targets023[1] + 1
+        if int(pqdz_023[2])>0:
+            pqdz_targets023[2] = pqdz_targets023[2] + 1
+        if int(pqdz_049[0])>0:
+            pqdz_targets049[0] = pqdz_targets049[0] + 1
+        if int(pqdz_049[1])>0:
+            pqdz_targets049[1] = pqdz_targets049[1] + 1
+        if int(pqdz_049[2])>0:
+            pqdz_targets049[2] = pqdz_targets049[2] + 1
+        if int(pqdz_080[0])>0:
+            pqdz_targets080[0] = pqdz_targets080[0] + 1
+        if int(pqdz_080[1])>0:
+            pqdz_targets080[1] = pqdz_targets080[1] + 1
+        if int(pqdz_080[2])>0:
+            pqdz_targets080[2] = pqdz_targets080[2] + 1
 
-        if pqdz_target_accurate_top10 == True:
-            succeded_predictions_pqdz_top10 = succeded_predictions_pqdz_top10 + 1
+        if int(zrank_023[0])>0:
+            zrank_targets023[0] = zrank_targets023[0] + 1
+        if int(zrank_023[1])>0:
+            zrank_targets023[1] = zrank_targets023[1] + 1
+        if int(zrank_023[2])>0:
+            zrank_targets023[2] = zrank_targets023[2] + 1
+        if int(zrank_049[0])>0:
+            zrank_targets049[0] = zrank_targets049[0] + 1
+        if int(zrank_049[1])>0:
+            zrank_targets049[1] = zrank_targets049[1] + 1
+        if int(zrank_049[2])>0:
+            zrank_targets049[2] = zrank_targets049[2] + 1
+        if int(zrank_080[0])>0:
+            zrank_targets080[0] = zrank_targets080[0] + 1
+        if int(zrank_080[1])>0:
+            zrank_targets080[1] = zrank_targets080[1] + 1
+        if int(zrank_080[2])>0:
+            zrank_targets080[2] = zrank_targets080[2] + 1
 
-        if zrank_target_accurate_top10 == True:
-            succeded_predictions_zrank_top10 = succeded_predictions_zrank_top10 + 1
 
-##################################################################################Top100
-
-        if pqd_target_accurate_top100 == True:
-            succeded_predictions_pqd_top100 = succeded_predictions_pqd_top100 + 1
-
-        if pqdz_target_accurate_top100 == True:
-            succeded_predictions_pqdz_top100 = succeded_predictions_pqdz_top100 + 1
-
-        if zrank_target_accurate_top100 == True:
-            succeded_predictions_zrank_top100 = succeded_predictions_zrank_top100 + 1
 
 
 
 
 
     print('\n\n\n\n\n')
-    print("-------PQD TOTAL PERFORMANCE 0.80-------")
-    print("Top1:", succeded_predictions_pqd_top1, "out of", tot_targets, "successful")
-    print("Top10:", succeded_predictions_pqd_top10, "out of", tot_targets, "successful")
-    print("Top100:", succeded_predictions_pqd_top100, "out of", tot_targets, "successful")
+    print("-------PQD TOTAL PERFORMANCE OUT OF", tot_targets, "-------")
+    print("0.23 <top1, top10, top100>:", pqd_targets023)
+    print("0.49 <top1, top10, top100>:", pqd_targets049)
+    print("0.80 <top1, top10, top100>:", pqd_targets080)
 
-    print("------PQDZ TOTAL PERFORMANCE 0.80-------")
-    print("Top1:", succeded_predictions_pqdz_top1, "out of", tot_targets, "successful")
-    print("Top10:", succeded_predictions_pqdz_top10, "out of", tot_targets, "successful")
-    print("Top100:", succeded_predictions_pqdz_top100, "out of", tot_targets, "successful")
+    print("-------PQDZ TOTAL PERFORMANCE OUT OF", tot_targets, "-------")
+    print("0.23 <top1, top10, top100>:", pqdz_targets023)
+    print("0.49 <top1, top10, top100>:", pqdz_targets049)
+    print("0.80 <top1, top10, top100>:", pqdz_targets080)
 
-    print("------ZRANK TOTAL PERFORMANCE 0.80------")
-    print("Top1:", succeded_predictions_zrank_top1, "out of", tot_targets, "successful")
-    print("Top10:", succeded_predictions_zrank_top10, "out of", tot_targets, "successful")
-    print("Top100:", succeded_predictions_zrank_top100, "out of", tot_targets, "successful")
-
-
+    print("-------ZRANK TOTAL PERFORMANCE OUT OF", tot_targets, "-------")
+    print("0.23 <top1, top10, top100>:", zrank_targets023)
+    print("0.49 <top1, top10, top100>:", zrank_targets049)
+    print("0.80 <top1, top10, top100>:", zrank_targets080)
 
 
-    plot_performance(succeded_predictions_pqd_top10, succeded_predictions_pqdz_top10, succeded_predictions_zrank_top10)
+
+
+
+
+    plot_performance(pqd_targets023, pqd_targets049, pqd_targets080, pqdz_targets023, pqdz_targets049, pqdz_targets080, zrank_targets023, zrank_targets049, zrank_targets080)
 
 
 

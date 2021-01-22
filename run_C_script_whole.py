@@ -15,9 +15,10 @@ import math
 from matplotlib import colors
 import traceback
 from collections import OrderedDict
+import matplotlib.pyplot as plt
 
 
-def find_all_contacts(complex, res_dict, composition_counter, check, one_model, within_model, between_models, cut_off, no_interchain_contacts_file):
+def find_all_contacts(complex, pro_interface_dict, composition_counter, check, one_model, within_model, between_models, cut_off, no_interchain_contacts_file, trp_file, trps):
     translation_dict = {}
     string_position_to_chain_dict = {}
     insertion_residues_list = []
@@ -97,9 +98,11 @@ def find_all_contacts(complex, res_dict, composition_counter, check, one_model, 
             string_pos = string_pos + 1
 
 
-    contact_with_anything_across = None
+
+
 
     for line in lines:
+        contact_with_anything_across = None
         if line[:3] == "RES":
             line_split_by_space = line.split()
             pos = (line_split_by_space[2])
@@ -110,8 +113,8 @@ def find_all_contacts(complex, res_dict, composition_counter, check, one_model, 
             all_contacts_in_string = re.findall(pattern, line) #list with length 1, all distances as a string
             list_of_distances = all_contacts_in_string[0].split() #distances in string format in list
 
-
             column = 0
+
             for distance in list_of_distances:
                 distance = float(distance)
                 if distance < cut_off:
@@ -122,12 +125,18 @@ def find_all_contacts(complex, res_dict, composition_counter, check, one_model, 
                         number_of_contacts_between_chains = number_of_contacts_between_chains + 1
                         print(res, pos+chain, "is in contact with", contact_res, "at", position_chain_id, "Distance: ", distance)
 
+                        if res == "W" and contact_res == "W":
+                            info = str(res) + " "+  str(pos)+" " +str(chain)+ " is in contact with "+ str(contact_res)+ " at "+ str(position_chain_id)+ " Distance: "+ str(distance)
+                            row = complex + "  "+ info + '\n'
+                            trp_file.write(row)
+                            trps = trps + 1
+
                         contact_residue = translation_dict[position_chain_id]
-                        res_dict[res].update(contact_residue)
+                        pro_interface_dict[res].update(contact_residue)
                         contact_with_anything_across = True
 
                         if contact_residue != res: #to avoid adding extra bonds between two identical residues ie glycin - glycin
-                            res_dict[contact_residue].update(res)
+                            pro_interface_dict[contact_residue].update(res)
 
 
                 column = column + 1
@@ -150,7 +159,7 @@ def find_all_contacts(complex, res_dict, composition_counter, check, one_model, 
 
 
 
-    return check, one_model, within_model, between_models
+    return check, one_model, within_model, between_models, trps
 
 
 def many_models_find_contacts(complex, within_model, between_models):
@@ -292,9 +301,30 @@ def calc_composition(composition_counter, check):
 
 
     plot_list = sorted(plot_list, key = lambda x:x[1], reverse = True)
+
+    composition_dict = {}
     for item in plot_list:
-        x_list.append(item[0])
-        y_list.append(item[1])
+        residue = item[0]
+        ratio = item[1]
+        composition_dict[residue] = ratio
+
+    x_list = ["G", "A", "L", "V", "S", "T", "P", "I", "E", "D", "N", "R", "F", "K", "Y", "Q", "H", "M", "C", "W"]
+    for residue in x_list:
+        try:
+            value = composition_dict[residue]
+        except KeyError:
+            value = 0
+        y_list.append(value)
+
+
+    #for item in plot_list:
+    #    x_list.append(item[0])
+    #    y_list.append(item[1])
+
+    df = pd.DataFrame.from_dict(composition_dict, orient = "index")
+    df.to_csv('/proj/wallner/users/x_karst/exjobb/tables/composition_whole.csv')
+
+
 
     import matplotlib.pyplot as plt
     plt.scatter(x_list, y_list)
@@ -304,6 +334,7 @@ def calc_composition(composition_counter, check):
     plt.ylim(0,12)
     title = "Interface composition for " + str(check)+ " complexes"
     plt.title(title)
+    plt.savefig("/proj/wallner/users/x_karst/exjobb/pictures/composition_whole.png", bbox_inches='tight')
     plt.show()
 
 
@@ -311,8 +342,12 @@ def calc_composition(composition_counter, check):
 
 
 
-def plot_number_of_interactions(res_dict, check):
-    df = pd.DataFrame(res_dict)
+def plot_number_of_interactions(pro_interface_dict, check):
+
+
+    fig_path = "/proj/wallner/users/x_karst/exjobb/pictures/numb_interactions_glaser_propro.png"
+
+    df = pd.DataFrame(pro_interface_dict)
     df = df.sort_index(0, ascending=False)
     df = df.sort_index(1)
     print('\n', "Number of interactions")
@@ -321,24 +356,34 @@ def plot_number_of_interactions(res_dict, check):
     heatmap = sns.heatmap(df, linewidth = 0.5, cmap="Blues").set_title(title)
 
     import matplotlib.pyplot as plt
+    plt.savefig(fig_path, bbox_inches='tight')
     plt.show()
 
     return
 
 
 
-def plot_normalized_contacts_and_likelihood(res_dict, check, fraction_dict):
+def plot_normalized_contacts_and_likelihood(pro_interface_dict, check, fraction_dict):
     normalized_dict = defaultdict(dict)
     numb_all_interactions = {}
-    res_dict = dict(res_dict)
+    pro_interface_dict = dict(pro_interface_dict)
     tot_numb_interactions = 0
+    tot_numb_interactions_dict = {}
 
-    for master_residue, small_dict in res_dict.items():
-        all_interactions_with_master_residue = sum(small_dict.values())
-        numb_all_interactions[master_residue] = all_interactions_with_master_residue
-        tot_numb_interactions = tot_numb_interactions + all_interactions_with_master_residue
-        #print(all_interactions)
-    for master_residue, small_dict in res_dict.items():
+    for master_residue, small_dict in pro_interface_dict.items():
+        all_interactions_with_master_residue  = 0
+        for mini_res, contacts in small_dict.items():
+            if mini_res == master_residue:
+                all_interactions_with_master_residue = all_interactions_with_master_residue + contacts
+            else:
+                all_interactions_with_master_residue = all_interactions_with_master_residue + (contacts/2)
+        tot_numb_interactions_dict[master_residue] = all_interactions_with_master_residue
+    tot_numb_interactions= sum(tot_numb_interactions_dict.values())
+
+
+    print("Number of interactions:", tot_numb_interactions)
+
+    for master_residue, small_dict in pro_interface_dict.items():
         for mini_residue, number in small_dict.items():
             normalized_number_contacts = number/tot_numb_interactions
             normalized_dict[master_residue][mini_residue] =normalized_number_contacts
@@ -354,24 +399,26 @@ def plot_normalized_contacts_and_likelihood(res_dict, check, fraction_dict):
     heatmap = sns.heatmap(df, linewidth = 0.5, cmap = "Blues").set_title(title)
 
     import matplotlib.pyplot as plt
+
+    plt.savefig("/proj/wallner/users/x_karst/exjobb/pictures/propro_normalized_interactions_glaser.png", bbox_inches='tight')
+
     plt.show()
 
-
-    likelihood_dict = defaultdict(dict)
+#########################################################################################################
+    residue_order = ["R", "K", "N", "D", "Q", "E", "H", "P", "Y", "W", "S", "T", "G", "A", "M", "C", "F", "L", "V", "I"] # to sort the same way the article did
+    likelihood_dict = OrderedDict({key: OrderedDict({key: None for key in residue_order}) for key in residue_order})
 
     for master_residue, small_dict in normalized_dict.items():
-        for mini_residue, number in small_dict.items():
+        for mini_residue, number in small_dict.items(): #why number?
             w_i = fraction_dict[master_residue]
             w_j = fraction_dict[mini_residue]
             q_ij = normalized_dict[master_residue][mini_residue]
-
             likelihood = 10 * (math.log(q_ij/(w_i * w_j)))
-
             likelihood_dict[master_residue][mini_residue] = likelihood
 
     df_2 = pd.DataFrame(likelihood_dict)
-    df_2 = df_2.sort_index(0, ascending=False)
-    df_2 = df_2.sort_index(1)
+#    df_2 = df_2.sort_index(0, ascending=False)
+#    df_2 = df_2.sort_index(1)
     print("Likelihood")
     print(df_2)
 
@@ -379,32 +426,52 @@ def plot_normalized_contacts_and_likelihood(res_dict, check, fraction_dict):
 
     heatmap = sns.heatmap(df_2, linewidth = 0.5, cmap = "seismic", center = 0).set_title(title_2)
     import matplotlib.pyplot as plt
+    plt.savefig("/proj/wallner/users/x_karst/exjobb/pictures/gij_whole.png", bbox_inches='tight')
+
     plt.show()
 
     ###########################################
     volume_dict = {"I": 166.1, "F":189.7, "V":138.8, "L":168.0 , "W":227.9, "M":165.2, "A":87.8, "G":59.9, "C":105.4, "Y":191.2, "P":123.3, "T":118.3, "S":91.7, "H":156.3, "E":140.9, "N":120.1, "Q":145.1, "D":115.4, "K":172.7, "R":188.2}
-    residue_order = ["R", "K", "N", "D", "Q", "E", "H", "P", "Y", "W", "S", "T", "G", "A", "M", "C", "F", "L", "V", "I"] # to sort the same way the article did
-    opposite_order = ["I", "V", "L", "F", "C", "M", "A", "G", "T", "S", "W", "Y", "P", "H", "E", "Q", "D", "N", "K", "R"] # to have the graph symmetric
+
 
     normalized_volume_dict = defaultdict(dict)
     likelihood_volume_dict = OrderedDict({key: OrderedDict({key: None for key in residue_order}) for key in residue_order})
-    #likelihood_volume_dict = defaultdict(dict)
     sum_of_contacts_times_volume = 0 #sum(Ckl * Vk * Vl)
+    onedim_contacts_dict ={}
 
-    for master_residue, small_dict in res_dict.items(): #calculate fixed denominator
+    for master_residue, small_dict in pro_interface_dict.items():
         for mini_residue, number_of_contacts in small_dict.items():
-            product = number_of_contacts * volume_dict[master_residue]*volume_dict[mini_residue]
-            sum_of_contacts_times_volume = sum_of_contacts_times_volume + product
+            if ((master_residue, mini_residue) and (mini_residue, master_residue)) not in onedim_contacts_dict.keys():
+                onedim_contacts_dict[(master_residue, mini_residue)] = number_of_contacts
 
-    for master_residue, small_dict in res_dict.items(): #calculate new Q(v)ij with regard to volume
-        for mini_residue, number in small_dict.items():
-            c_ij = number
+    print(onedim_contacts_dict)
+    print("Number of interactions:", sum(onedim_contacts_dict.values()))
+
+
+    for (res1, res2) in onedim_contacts_dict.keys(): #calc sum(Ckl * Vk * Vl)
+        numb_of_contacts_res1_res2 = onedim_contacts_dict[(res1, res2)]
+        v_i = volume_dict[res1]
+        v_j = volume_dict[res2]
+        product = numb_of_contacts_res1_res2 * v_i * v_j
+        sum_of_contacts_times_volume = sum_of_contacts_times_volume + product
+
+
+    # for master_residue, small_dict in pro_interface_dict.items(): #calculate fixed denominator sum(Ckl * Vk * Vl)
+    #     for mini_residue, number_of_contacts in small_dict.items():
+    #         product = number_of_contacts * volume_dict[master_residue]*volume_dict[mini_residue]
+    #         sum_of_contacts_times_volume = sum_of_contacts_times_volume + product #dubbelkolla detta
+
+
+
+    for master_residue, small_dict in pro_interface_dict.items(): #calculate new Q(v)ij with regard to volume
+        for mini_residue, contacts in small_dict.items():
+            c_ij = contacts
             v_i = volume_dict[master_residue]
             v_j = volume_dict[mini_residue]
             norm_vol = c_ij * v_i * v_j /sum_of_contacts_times_volume
             normalized_volume_dict[master_residue][mini_residue] = norm_vol
 
-    for master_residue, small_dict in res_dict.items(): #calculate G(v)ij
+    for master_residue, small_dict in pro_interface_dict.items(): #calculate G(v)ij
         for mini_residue, number in small_dict.items():
             w_i = fraction_dict[master_residue]
             w_j = fraction_dict[mini_residue]
@@ -415,23 +482,23 @@ def plot_normalized_contacts_and_likelihood(res_dict, check, fraction_dict):
 
 
 
-    #ordered_likelihood_volume_dict = OrderedDict(sorted(likelihood_volume_dict.items(), key = lambda i:residue_order.index(i[0])))
-    print(likelihood_volume_dict)
 
-
-
+    #print(likelihood_volume_dict)
     df_3 = pd.DataFrame(likelihood_volume_dict)
-    #df_3 = df_3.sort_index(0, key = lambda i:residue_order.index(i[0]))
-    #df_3 = df_3.sort_index(1)
-
     print(df_3)
+    df_3_reorder = df_3.iloc[::-1]
+    df_3_reorder = df_3_reorder.iloc[:, ::-1]
+    print(df_3_reorder)
+
+
+    df_3_reorder.to_csv('/proj/wallner/users/x_karst/exjobb/tables/gijv_whole.csv', index = False)
 
     title_3 = "Likelihood of interaction Gij(v) based on "+ str(check)+" complexes"
-
-    heatmap_3 = sns.heatmap(df_3, linewidth = 0.5, cmap = "seismic", center = 0).set_title(title_3)
-
+    heatmap_3 = sns.heatmap(df_3, linewidth = 0.5, cmap = "seismic", center = 0, vmin = -15, vmax = 25).set_title(title_3)
 
     import matplotlib.pyplot as plt
+
+    plt.savefig("/proj/wallner/users/x_karst/exjobb/pictures/gijv_whole.png", bbox_inches='tight')
     plt.show()
 
 
@@ -441,14 +508,26 @@ def plot_normalized_contacts_and_likelihood(res_dict, check, fraction_dict):
 
 def main():
     args = sys.argv[1:]
-    dataset_file = args[0]
-    cut_off=args[1]
-    cut_off = float(cut_off)
+
+    try:
+        cut_off=args[0]
+
+    except IndexError:
+        print("USAGE: run_C_script.py cutoff")
+
+    dataset_file = "/proj/wallner/users/x_karst/exjobb/dataset_whole.out"
     dataset_file= open(dataset_file, "r")
+    cut_off = float(cut_off)
+
+
+
+    trp_file = open("/proj/wallner/users/x_karst/exjobb/trp_contacts.txt", "w")
+    trps = 0
+
 
     complexes = dataset_file.readlines()
 
-    res_dict = defaultdict(Counter)
+    pro_interface_dict = defaultdict(Counter)
     composition_counter = Counter()
 
 
@@ -456,15 +535,15 @@ def main():
     within_model = 0
     between_models = 0
     error_files = 0
-    wrongs_file = open("/proj/wallner/users/x_karst/exjobb/c_script_errors.txt", "w")
-    no_interchain_contacts_file = open("/proj/wallner/users/x_karst/exjobb/c_script_no_interchain_contacts.txt", "w")
+    wrongs_file = open("/proj/wallner/users/x_karst/exjobb/cscript_errors_whole.txt", "w")
+    no_interchain_contacts_file = open("/proj/wallner/users/x_karst/exjobb/cscript_no_interchain_contacts_whole.txt", "w")
 
     check = 0
 
 
     for complex in complexes:
         try:
-            check, one_model, within_model, between_models = find_all_contacts(complex, res_dict, composition_counter, check, one_model, within_model, between_models, cut_off, no_interchain_contacts_file)
+            check, one_model, within_model, between_models, trps = find_all_contacts(complex, pro_interface_dict, composition_counter, check, one_model, within_model, between_models, cut_off, no_interchain_contacts_file, trp_file, trps)
         except KeyError:
             print("KeyError in ", complex)
             error = traceback.format_exc()
@@ -474,29 +553,18 @@ def main():
             error_files = error_files + 1
 
 
-        #
-        #
-        # if check == 50:
-        #     #print(res_dict)
-        #     print('\n')
-        #     print("Only one model: ", one_model)
-        #     print("Interactions within same model but more models exist: ", within_model)
-        #     print("Interactions between models: ", between_models )
-        #     plot_number_of_interactions(res_dict, check)
-        #     fraction_dict = calc_composition(composition_counter, check)
-        #     plot_normalized_contacts_and_likelihood(res_dict, check, fraction_dict)
-        #     dataset_file.close()
-        #     wrongs_file.close()
-        #
-        #     return
+        
 
 
 
 
 
-    plot_number_of_interactions(res_dict, check)
+
+
+
+    plot_number_of_interactions(pro_interface_dict, check)
     fraction_dict = calc_composition(composition_counter, check)
-    plot_normalized_contacts_and_likelihood(res_dict, check, fraction_dict)
+    plot_normalized_contacts_and_likelihood(pro_interface_dict, check, fraction_dict)
 
     print('\n')
     print("Number of complexes: ", check)

@@ -14,62 +14,54 @@ import csv
 
 
 def find_targets(which_set):
-
-    if which_set == "propro":
+    if which_set == "glaser_propro":
         targets_list = []
-        for (root, dirs, files) in walk(f"/proj/wallner/users/x_karst/exjobb/evaluate_scoring_matrix/propro_matrix/CAPRI_myscore/"):
+        for (root, dirs, files) in walk(f"/proj/wallner/users/x_karst/exjobb/evaluate_scoring_matrix/glaser_matrix/CAPRI/"):
             for dir in dirs:
                 target_path = (root+dir)
                 targets_list.append(target_path)
 
 
-        for (dir_path, dirnames, filenames) in walk(f"/proj/wallner/users/x_karst/exjobb/evaluate_scoring_matrix/propro_matrix/MOAL_myscore/"):
+        for (dir_path, dirnames, filenames) in walk(f"/proj/wallner/users/x_karst/exjobb/evaluate_scoring_matrix/glaser_matrix/MOAL/"):
             for dir in dirnames:
                 target_path = (dir_path+dir)
                 targets_list.append(target_path)
 
 
 
-    if which_set == "propep_sym":
+    if which_set == "glaser_propep":
         targets_list = []
-        for (dir_path, dirnames, filenames) in walk(f"/proj/wallner/users/x_karst/exjobb/evaluate_scoring_matrix/propep_matrices/myscores_sym/"):
+        for (dir_path, dirnames, filenames) in walk(f"/proj/wallner/users/x_karst/exjobb/evaluate_scoring_matrix/glaser_matrix/propep/glaser_scores/"):
             for file in filenames:
-                target_path = dir_path+file
-                #print(target_path)
-                targets_list.append(target_path)
-
-
-    if which_set == "propep_asym":
-        targets_list = []
-        for (dir_path, dirnames, filenames) in walk(f"/proj/wallner/users/x_karst/exjobb/evaluate_scoring_matrix/propep_matrices/myscores_asym/"):
-            for file in filenames:
+                print(file)
                 target_path = dir_path+file
                 targets_list.append(target_path)
 
+    print(targets_list)
 
 
-    return targets_list #find all targets. for propro: CAPRI and MOAL. For propep it is in either asymmetric or symmetric scores.
+    return targets_list #find all targets. for propro: CAPRI and MOAL. FOr propep: in glaserscores
 
 
 
 def sort_scores_023(targets_list, which_set):
     dict_023_performance = {}
 
-    if which_set == "propro":
+    if which_set == "glaser_propro":
         correct_models_dict = pickle.load(open("/proj/wallner/users/x_karst/exjobb/evaluate_scoring_matrix/propro_matrix/dockq_natives_0.23.p", "rb"))
-    if which_set == "propep_asym" or which_set == "propep_sym":
-        correct_models_dict = pickle.load(open("/proj/wallner/users/x_karst/exjobb/evaluate_scoring_matrix/propep_matrices/dockq_natives_0.23.p", "rb"))
 
+    if which_set == "glaser_propep":
+        correct_models_dict = pickle.load(open("/proj/wallner/users/x_karst/exjobb/evaluate_scoring_matrix/glaser_matrix/propep/dockq_natives_0.23.p", "rb"))
 
     for target in targets_list:
         print("------------------------------------------")
         print(target, "Benchmark: 0.23")
 
-        if which_set == "propro":
+        if which_set == "glaser_propro":
             target_name = os.path.basename(target)
             target_file = target+"/myscore_"+target_name+".txt"
 
-        if which_set == "propep_asym" or which_set == "propep_sym":
+        if which_set == "glaser_propep":
             target_file = target
             target_name = os.path.basename(target)
 
@@ -102,10 +94,11 @@ def sort_scores_023(targets_list, which_set):
 def sort_scores_049(targets_list, which_set):
     dict_049_performance = {}
 
-    if which_set == "propro":
+    if which_set == "glaser_propro":
         correct_models_dict = pickle.load(open("/proj/wallner/users/x_karst/exjobb/evaluate_scoring_matrix/propro_matrix/dockq_natives_0.49.p", "rb"))
-    if which_set == "propep_sym" or which_set == "propep_asym":
-        correct_models_dict = pickle.load(open("/proj/wallner/users/x_karst/exjobb/evaluate_scoring_matrix/propep_matrices/dockq_natives_0.49.p", "rb"))
+
+    if which_set == "glaser_propep":
+        correct_models_dict = pickle.load(open("/proj/wallner/users/x_karst/exjobb/evaluate_scoring_matrix/glaser_matrix/propep/dockq_natives_0.49.p", "rb"))
 
 
 
@@ -114,15 +107,14 @@ def sort_scores_049(targets_list, which_set):
         print(target, "Benchmark: 0.49")
 
 
-        if which_set == "propro":
+        if which_set == "glaser_propro":
             target_name = os.path.basename(target)
             target_file = target+"/myscore_"+target_name+".txt"
 
-        if which_set == "propep_asym" or which_set == "propep_sym":
+
+        if which_set == "glaser_propep":
             target_file = target
             target_name = os.path.basename(target)
-
-
 
 
 
@@ -154,22 +146,22 @@ def sort_scores_049(targets_list, which_set):
 def sort_scores_080(targets_list, which_set):
     dict_080_performance = {}
 
-    if which_set == "propro":
+    if which_set == "glaser_propro":
         correct_models_dict = pickle.load(open("/proj/wallner/users/x_karst/exjobb/evaluate_scoring_matrix/propro_matrix/dockq_natives_0.8.p", "rb"))
-    if which_set == "propep_sym" or which_set == "propep_asym":
-        correct_models_dict = pickle.load(open("/proj/wallner/users/x_karst/exjobb/evaluate_scoring_matrix/propep_matrices/dockq_natives_0.8.p", "rb"))
 
+    if which_set == "glaser_propep":
+        correct_models_dict = pickle.load(open("/proj/wallner/users/x_karst/exjobb/evaluate_scoring_matrix/glaser_matrix/propep/dockq_natives_0.8.p", "rb"))
 
     for target in targets_list:
         print("------------------------------------------")
         print(target, "Benchmark: 0.80")
 
 
-        if which_set == "propro":
+        if which_set == "glaser_propro":
             target_name = os.path.basename(target)
             target_file = target+"/myscore_"+target_name+".txt"
 
-        if which_set == "propep_asym" or which_set == "propep_sym":
+        if which_set == "glaser_propep":
             target_file = target
             target_name = os.path.basename(target)
 
@@ -203,7 +195,7 @@ def check_top100(top100, correct_models_dict, which_set):
 
     for entry in top100:
         model = entry.split()[0]
-        if which_set == "propro":
+        if which_set == "glaser_propro":
             if model[0] == "T": #from CAPRI data set
                 first_name = model.split("-")[0]
                 first_name = first_name[6:]
@@ -223,7 +215,7 @@ def check_top100(top100, correct_models_dict, which_set):
 
             total_models = total_models + 1
 
-        if which_set == "propep_sym" or which_set == "propep_asym":
+        if which_set == "glaser_propep":
             if model in correct_models_dict.keys():
                 correct_models = correct_models + 1
 
@@ -243,7 +235,7 @@ def check_top10(top10, correct_models_dict, which_set):
     total_models = 0
     for entry in top10:
         model = entry.split()[0]
-        if which_set == "propro":
+        if which_set == "glaser_propro":
             if model[0] == "T": #from CAPRI data set
                 first_name = model.split("-")[0]
                 first_name = first_name[6:]
@@ -262,7 +254,7 @@ def check_top10(top10, correct_models_dict, which_set):
             total_models = total_models + 1
 
 
-        if which_set == "propep_sym" or which_set == "propep_asym":
+        if which_set == "glaser_propep":
             if model in correct_models_dict.keys():
                 correct_models = correct_models + 1
 
@@ -283,7 +275,7 @@ def check_top1(top1, correct_models_dict, which_set):
 
     model = top1.split()[0]
 
-    if which_set == "propro":
+    if which_set == "glaser_propro":
         if model[0] == "T": #from CAPRI data set
             first_name = model.split("-")[0]
             first_name = first_name[6:]
@@ -303,7 +295,9 @@ def check_top1(top1, correct_models_dict, which_set):
 
         total_models = total_models + 1
 
-    if which_set == "propep_sym" or which_set == "propep_asym":
+
+
+    if which_set == "glaser_propep":
         if model in correct_models_dict.keys():
             correct_models = correct_models + 1
 
@@ -440,13 +434,14 @@ def plot_bars_propro(dict_023_049_080, which_set):
 
                 plt.ylim((0,105))
                 plt.xticks(r2, targets_list_MOAL, fontsize = 8)
-                plt.title(f'Performance of propro matrix on MOAL set ({edition}/6) with 3 DockQ quality benchmarks', fontweight='bold')
+                plt.title(f'Performance on MOAL set ({edition}/6) with 3 DockQ quality benchmarks', fontweight='bold')
                 plt.xlabel("Target complexes")
                 plt.ylabel('Performance [%]')
                 plt.legend()
                 plt.tight_layout()
-                if which_set == "propro":
-                    plt.savefig(f"/proj/wallner/users/x_karst/exjobb/pictures/my_performance_MOAL_{edition}.png")
+
+                if which_set == "glaser_propro":
+                    plt.savefig(f"/proj/wallner/users/x_karst/exjobb/pictures/glaser_pro_performance_MOAL_{edition}.png")
 
                 plt.clf()
 
@@ -531,14 +526,14 @@ def plot_bars_propro(dict_023_049_080, which_set):
 
     plt.xticks(r2, targets_list_CAPRI, fontsize = 10)
     plt.xlabel("Target complexes", fontweight = "bold")
-    plt.title(f'Performance of true propro matrix on CAPRI set with 3 DockQ quality benchmarks', fontweight='bold')
+    plt.title(f'Performance on CAPRI set with 3 DockQ quality benchmarks', fontweight='bold')
     plt.ylabel('Performance [%]', fontweight = "bold")
     plt.legend()
     plt.tight_layout()
 
+    if which_set == "glaser_propro":
+        plt.savefig(f"/proj/wallner/users/x_karst/exjobb/pictures/glaser_pro_performance_CAPRI.png")
 
-    if which_set == "propro":
-        plt.savefig(f"/proj/wallner/users/x_karst/exjobb/pictures/my_performance_CAPRI.png")
 
     plt.clf()
 
@@ -641,15 +636,14 @@ def plot_bars_propep(dict_023_049_080, which_set):
             plt.xticks(r2, targets_list, fontsize = 8.5)
             plt.xlabel("Target complexes", fontweight = "bold")
 
-            if which_set == "propep_sym":
-                plt.title(f'Performance of symmetric propep matrix with 3 DockQ quality benchmarks ({edition}/2)', fontweight='bold')
-            if which_set == "propep_asym":
-                plt.title(f'Performance of asymmetric propep matrix with 3 DockQ quality benchmarks ({edition}/2)', fontweight='bold')
+
+            if which_set == "glaser_propep":
+                plt.title(f'Performance of glaser matrix with 3 DockQ quality benchmarks ({edition}/2)', fontweight='bold')
 
             plt.ylabel('Performance [%]', fontweight = "bold")
             plt.legend()
             plt.tight_layout()
-            plt.savefig(f"/proj/wallner/users/x_karst/exjobb/pictures/my_performance_{which_set}_{edition}.png")
+            plt.savefig(f"/proj/wallner/users/x_karst/exjobb/pictures/glaserperformance_{which_set}_{edition}.png")
 
             plt.clf()
 
@@ -675,21 +669,19 @@ def plot_bars_propep(dict_023_049_080, which_set):
 def create_csv(dict_023_049_080, which_set):
     print("Creating csv file...")
     csv_dict = {}
-    if which_set == "propro":
-        f = open('/proj/wallner/users/x_karst/exjobb/tables/myperformance_CnM_023_049_080.csv','w')
 
-    if which_set == "propep_sym":
-        f = open('/proj/wallner/users/x_karst/exjobb/tables/myperformance_sympeptide_023_049_080.csv','w')
+    if which_set == "glaser_propro":
+        f = open('/proj/wallner/users/x_karst/exjobb/tables/glaser_performance_CnM.csv','w')
 
-    if which_set == "propep_asym":
-        f = open('/proj/wallner/users/x_karst/exjobb/tables/myperformance_asympeptide_023_049_080.csv','w')
+    if which_set == "glaser_propep":
+        f = open('/proj/wallner/users/x_karst/exjobb/tables/glaser_performance_propep.csv','w')
 
 
     f.write("Target,Top1 0.23 [%],Top10 0.23 [%],Top100 0.23 [%],Top1 0.49 [%],Top10 0.49 [%],Top100 0.49 [%],Top1 0.80 [%],Top10 0.80 [%],Top100 0.80 [%]\n")
 
     for target, tuples in dict_023_049_080.items():
-        if which_set == "propep_sym" or which_set == "propep_asym":
-            target= target.split("_")[2] # myscore_propep_4uqyBA11.txt -> 4uqyBA11.txt
+        if which_set == "glaser_propep":
+            target= target.split("_")[2] # glaserscore_propep_4uqyBA11.txt -> 4uqyBA11.txt
             target = target.split(".")[0] #4uqyBA11.txt -> 4uqyBA11
 
 
@@ -725,11 +717,11 @@ def create_csv(dict_023_049_080, which_set):
 def main():
     try:
         args = sys.argv[1:]
-        which_set = args[0] #propro or propep_asym or propep_sym
+        which_set = args[0] #glaser_pro or glaser_propep
 
 
     except IndexError:
-        print("USAGE: [propro] [propep_sym] [propep_asym]")
+        print("USAGE: [glaser_propro] [glaser_propep]")
         return
 
     targets_list = find_targets(which_set)   #list of files, one file contains scores for all models of that target
@@ -746,13 +738,12 @@ def main():
 
     dict_023_049_080 = join_dicts(dict_023_performance, dict_049_performance, dict_080_performance)
 
-    if which_set == "propro":
+    if which_set == "glaser_propro":
         plot_bars_propro(dict_023_049_080, which_set)
 
-    if which_set == "propep_sym" or which_set == "propep_asym":
+
+    if which_set == "glaser_propep":
         plot_bars_propep(dict_023_049_080, which_set)
-
-
 
     create_csv(dict_023_049_080, which_set)
 

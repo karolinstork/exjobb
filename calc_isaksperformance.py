@@ -11,10 +11,10 @@ import csv
 
 
 def find_targets():
-    unavailable_targets = ["1gy3", "4imi", "4xvj", "1kcr", "4h3h", "3gz1", "4l1u", "4ajy", "5fgc", "1z9o"]
+    unavailable_targets = ["1gy3", "4imi", "4xvj", "1kcr", "4h3h", "3gz1", "4l1u", "4ajy", "5fgc", "1z9o"] #targets that were not possible to use for the scoring matrices
     targets_list = []
 
-    for (dir_path, dirnames, filenames) in walk(f"/proj/wallner/users/x_karst/exjobb/evaluate_scoring_matrix/pro_pep/isaks"):
+    for (dir_path, dirnames, filenames) in walk(f"/proj/wallner/users/x_karst/exjobb/evaluate_scoring_matrix/propep_matrices/isaks_zrank"):
         for file in filenames:
             if file[:4] not in unavailable_targets:
                 target_path = dir_path+"/"+file
@@ -62,48 +62,26 @@ def calc_performance(sorted_zrank, target):
 
 
 
-    print("------------ZRANK PERFORMANCE ON TARGET-------------")
-    print("\tTop1\tTop 10\tTop 100")
-    print("0.23:"+'\t'+ str((correct_1_zrank_023*100))+"%"+'\t'+ str((correct_10_zrank_023/10)*100)+"%"+'\t'+ str(correct_100_zrank_023)+"%")
-    print("0.49:"+'\t'+ str((correct_1_zrank_049*100))+"%"+'\t'+ str((correct_10_zrank_049/10)*100)+"%"+'\t'+ str(correct_100_zrank_049)+"%")
-    print("0.80:"+'\t'+ str((correct_1_zrank_080*100))+"%"+'\t'+ str((correct_10_zrank_080/10)*100)+"%"+'\t'+ str(correct_100_zrank_080)+"%")
-    print('\n')
-
 
 
     ####################################################################################
 
 
-    if correct_1_zrank_049>0:
-        zrank_target_accurate_top1 = True
-    else:
-        zrank_target_accurate_top1 = None
+    zrank_023 = (correct_1_zrank_023, correct_10_zrank_023, correct_100_zrank_023)
+    zrank_049 = (correct_1_zrank_049, correct_10_zrank_049, correct_100_zrank_049)
+    zrank_080 = (correct_1_zrank_080, correct_10_zrank_080, correct_100_zrank_080)
 
 
-    if correct_10_zrank_049>0:
-        zrank_target_accurate_top10 = True
-    else:
-        zrank_target_accurate_top10 = None
-
-
-    if correct_100_zrank_049>0:
-        zrank_target_accurate_top100 = True
-    else:
-        zrank_target_accurate_top100 = None
-
-
-
-    return zrank_target_accurate_top1, zrank_target_accurate_top10, zrank_target_accurate_top100
-
+    return zrank_023, zrank_049, zrank_080
 
 
 
 
 
 def check_pickledict(model, target, correct_023, correct_049, correct_080): #checks if model is a correct model according to all three benchmarks
-    correct_models_023 = pickle.load(open("/proj/wallner/users/x_karst/exjobb/evaluate_scoring_matrix/pro_pep/dockq_natives_0.23.p", "rb"))
-    correct_models_049 = pickle.load(open("/proj/wallner/users/x_karst/exjobb/evaluate_scoring_matrix/pro_pep/dockq_natives_0.49.p", "rb"))
-    correct_models_080 = pickle.load(open("/proj/wallner/users/x_karst/exjobb/evaluate_scoring_matrix/pro_pep/dockq_natives_0.8.p", "rb"))
+    correct_models_023 = pickle.load(open("/proj/wallner/users/x_karst/exjobb/evaluate_scoring_matrix/propep_matrices/dockq_natives_0.23.p", "rb"))
+    correct_models_049 = pickle.load(open("/proj/wallner/users/x_karst/exjobb/evaluate_scoring_matrix/propep_matrices/dockq_natives_0.49.p", "rb"))
+    correct_models_080 = pickle.load(open("/proj/wallner/users/x_karst/exjobb/evaluate_scoring_matrix/propep_matrices/dockq_natives_0.8.p", "rb"))
 
     target = os.path.basename(target)
     target = target.split(".")[0] #1elwCA01
@@ -134,49 +112,72 @@ def check_pickledict(model, target, correct_023, correct_049, correct_080): #che
 
 
 
-def plot_performance(succeded_predictions_zrank_top1, succeded_predictions_zrank_top10, succeded_predictions_zrank_top100, tot_targets):
+def plot_performance(zrank_targets023, zrank_targets049, zrank_targets080, tot_targets):
+    top1_023 = [zrank_targets023[0], 7, 4, 8, 7]
+    top10_023 = [zrank_targets023[1], 10, 13, 13, 16]
+    top100_023 = [zrank_targets023[2], 20, 19, 23, 22]
 
-    top1 = [succeded_predictions_zrank_top1, 2]
-    top10 = [succeded_predictions_zrank_top10, 4]
-    top100 = [succeded_predictions_zrank_top100, 9]
-    bars4 = top1+top10+top100
+    top1_049 = [zrank_targets049[0], 1, 0, 1, 2]
+    top10_049 = [zrank_targets049[1], 2, 3, 4, 4]
+    top100_049 = [zrank_targets049[2], 8, 7, 10, 9]
 
-    x_list = ["ZRANK", "Asymmetric scoring matrix"]
+    top1_080 = [zrank_targets080[0], 0, 0, 0, 0]
+    top10_080 = [zrank_targets080[1], 0, 0, 0, 0]
+    top100_080 = [zrank_targets080[2], 0, 0, 1, 1]
 
-    r = np.arange(len(top1))
-    barWidth = 0.25
-    r1 = list(np.arange(len(top1)))
+    bars10 = top1_023 + top10_023 + top100_023 + top1_049 + top10_049 + top100_049 + top1_080 + top10_080 + top100_080
+
+
+    x_list = ["ZRANK", "Glaser matrix", "True propro matrix", "Symmetric propep matrix", "Asymmetric propep matrix"]
+
+
+    barWidth = 0.08
+
+    r1 = list(np.arange(len(top1_023)))
+
     r2 = [x + barWidth for x in r1]
     r3 = [x + barWidth for x in r2]
-    r4 = r1+r2+r3
+    r4 = [x + barWidth for x in r3]
+    r5 = [x + barWidth for x in r4]
+    r6 = [x + barWidth for x in r5]
+    r7 = [x + barWidth for x in r6]
+    r8 = [x + barWidth for x in r7]
+    r9 = [x + barWidth for x in r8]
 
-    print(r1)
-    print(r2)
-    print(r3)
-    print(r4)
+    r10 = r1+r2+r3+r4+r5+r6+r7+r8+r9
 
-    plt.bar(r1, top1, color='#FFD435', edgecolor='white', width=barWidth, label = "Top1 hits")
-    plt.bar(r2, top10, color='#FF9735', edgecolor='white', width=barWidth, label = "Top10 hits")
-    plt.bar(r3, top100, color='#FC84B5', edgecolor='white', width=barWidth, label = "Top100 hits")
+    plt.figure(figsize = (9.4, 6.0), dpi = 190)
+    plt.bar(r1, top1_023, color='#FECD1C', edgecolor='white', width=barWidth, label = "Acceptable top 1")
+    plt.bar(r2, top10_023, color='#FFDC5D', edgecolor='white', width=barWidth, label = "Acceptable top 10")
+    plt.bar(r3, top100_023, color='#FFE99A', edgecolor='white', width=barWidth, label = "Acceptable top 100")
 
+    plt.bar(r4, top1_049, color='#FF7D00', edgecolor='white', width=barWidth, label = "Medium top 1")
+    plt.bar(r5, top10_049, color='#FF9735', edgecolor='white', width=barWidth, label = "Medium top 10")
+    plt.bar(r6, top100_049, color='#FCB775', edgecolor='white', width=barWidth, label = "Medium top 100")
 
-    plt.ylim((0,60))
+    plt.bar(r7, top1_080, color='#FF62A2', edgecolor='white', width=barWidth, label = "High top 1")
+    plt.bar(r8, top10_080, color='#FC84B5', edgecolor='white', width=barWidth, label = "High top 10")
+    plt.bar(r9, top100_080, color='#FFC7DE', edgecolor='white', width=barWidth, label = "High top 100")
 
-
-    label = [succeded_predictions_zrank_top1, 2, succeded_predictions_zrank_top10, 4, succeded_predictions_zrank_top100, 9]
-    print(label)
-
-    for i in range(len(r4)):
-        plt.text(x = r4[i]-0.03, y = bars4[i]+0.5, s = label[i], size = 8)
+    plt.ylim((0,40))
 
 
+    labels = list(top1_023 + top10_023 + top100_023 + top1_049 + top10_049 + top100_049 + top1_080 + top10_080 + top100_080)
 
-    plt.xticks([r + barWidth for r in range(len(x_list))], x_list)
-    plt.xlabel("Methods")
-    plt.title(f'Performance on {tot_targets} targets', fontweight='bold')
-    plt.ylabel('Number of targets with >=1 medium quality model hits')
+
+    for i in range(len(r10)):
+        plt.text(x = r10[i]-0.03, y = bars10[i]+0.5, s = labels[i], size = 6)
+
+
+
+    plt.xticks(r5, x_list, size = 8)
+
+
+    plt.xlabel("Methods", fontweight = "bold")
+    plt.title(f'Performance on {tot_targets} targets with 3 DockQ quality benchmarks', fontweight='bold')
+    plt.ylabel('Number of targets with >=1 model hits', fontweight = "bold")
     plt.tight_layout()
-    plt.legend()
+    plt.legend(fontsize = "small")
     plt.savefig(f"/proj/wallner/users/x_karst/exjobb/pictures/isaks_performance.png")
     plt.show()
     plt.clf()
@@ -196,39 +197,52 @@ def main():
     targets_list = find_targets()
 
 
-    succeded_predictions_zrank_top1 = 0
-    succeded_predictions_zrank_top10 = 0
-    succeded_predictions_zrank_top100 = 0
+
 
     tot_targets = 0
+    zrank_targets023 = [0, 0, 0]
+    zrank_targets049 = [0, 0, 0]
+    zrank_targets080 = [0, 0, 0]
 
 
     for target in targets_list:
+        print(target)
         sorted_zrank = sort_file(target)
-        zrank_target_accurate_top1, zrank_target_accurate_top10, zrank_target_accurate_top100 = calc_performance(sorted_zrank, target)
+        zrank_023, zrank_049, zrank_080 = calc_performance(sorted_zrank, target)
 
-        if zrank_target_accurate_top1 == True:
-            succeded_predictions_zrank_top1 = succeded_predictions_zrank_top1 + 1
-
-        if zrank_target_accurate_top10 == True:
-            succeded_predictions_zrank_top10 = succeded_predictions_zrank_top10 + 1
-
-        if zrank_target_accurate_top100 == True:
-            succeded_predictions_zrank_top100 = succeded_predictions_zrank_top100 + 1
+        if int(zrank_023[0])>0:
+            zrank_targets023[0] = zrank_targets023[0] + 1
+        if int(zrank_023[1])>0:
+            zrank_targets023[1] = zrank_targets023[1] + 1
+        if int(zrank_023[2])>0:
+            zrank_targets023[2] = zrank_targets023[2] + 1
+        if int(zrank_049[0])>0:
+            zrank_targets049[0] = zrank_targets049[0] + 1
+        if int(zrank_049[1])>0:
+            zrank_targets049[1] = zrank_targets049[1] + 1
+        if int(zrank_049[2])>0:
+            zrank_targets049[2] = zrank_targets049[2] + 1
+        if int(zrank_080[0])>0:
+            zrank_targets080[0] = zrank_targets080[0] + 1
+        if int(zrank_080[1])>0:
+            zrank_targets080[1] = zrank_targets080[1] + 1
+        if int(zrank_080[2])>0:
+            zrank_targets080[2] = zrank_targets080[2] + 1
 
         tot_targets = tot_targets + 1
 
 
 
 
-    print("------ZRANK TOTAL PERFORMANCE 0.49------")
-    print("Top1:", succeded_predictions_zrank_top1, "out of", tot_targets, "successful")
-    print("Top10:", succeded_predictions_zrank_top10, "out of", tot_targets, "successful")
-    print("Top100:", succeded_predictions_zrank_top100, "out of", tot_targets, "successful")
+
+    print("-------ZRANK TOTAL PERFORMANCE OUT OF", tot_targets, "-------")
+    print("0.23 <top1, top10, top100>:", zrank_targets023)
+    print("0.49 <top1, top10, top100>:", zrank_targets049)
+    print("0.80 <top1, top10, top100>:", zrank_targets080)
 
 
 
-    plot_performance(succeded_predictions_zrank_top1, succeded_predictions_zrank_top10, succeded_predictions_zrank_top100, tot_targets)
+    plot_performance(zrank_targets023, zrank_targets049, zrank_targets080, tot_targets)
 
 
 

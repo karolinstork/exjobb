@@ -16,6 +16,7 @@ warnings.simplefilter('ignore', BiopythonWarning)
 
 def renumber(file):
 
+
     native_path = "/proj/wallner/users/x_karst/exjobb/natives_propep/"+file
     new_native_path = "/proj/wallner/users/x_karst/exjobb/renumbered_natives/"+file
     new_native = open(new_native_path, "w")
@@ -109,7 +110,7 @@ def renumber(file):
             os.rename(old_path, ERROR_path)
 
     else:
-        print(file, "not corresponding with model")
+        print(file, "not corresponding with model. Different amount of residues.")
 
     return
 #########################################################################################
@@ -143,6 +144,7 @@ def check_similarity(native_path, model_path):
 
     print(native_path, model_path)
     print(native_list, model_list)
+
     if native_list == model_list:
         should_continue = True
     else:
@@ -165,7 +167,6 @@ def main():
     for file in list_of_files:
         renumber(file)
     
-
 
 
 

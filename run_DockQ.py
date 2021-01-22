@@ -18,9 +18,9 @@ def find_files():
     list_of_files = []
     for (dir_path, dirnames, filenames) in walk("/proj/wallner/users/x_isaak/ModelsKarolin/models/"):
         for filename in filenames:
-            path = dir_path+"/"+filename
-            list_of_files.append(path)
-
+            if os.path.basename(dir_path) != "3gz1QA03": #This directory had no native file in /interpepdeep/data/TwoChainFiles
+                path = dir_path+"/"+filename
+                list_of_files.append(path)
 
 
     print(list_of_files[0])
@@ -45,8 +45,8 @@ def run_dockq(file):
                 print("Native:", native_file)
 
 
-    output_file = open(f'/proj/wallner/users/x_karst/exjobb/evaluate_scoring_matrix/pro_pep/dockq_output/{first_name}/{last_name}.dockq', "w")
-    output_path = f"/proj/wallner/users/x_karst/exjobb/evaluate_scoring_matrix/pro_pep/dockq_output/{first_name}/{last_name}.dockq"
+    output_file = open("/proj/wallner/users/x_karst/exjobb/evaluate_scoring_matrix/pro_pep/dockq_output/"+first_name+"/"+last_name+".dockq", "w")
+    output_path = "/proj/wallner/users/x_karst/exjobb/evaluate_scoring_matrix/pro_pep/dockq_output/"+first_name+"/"+last_name+".dockq"
     subprocess.call(["/proj/wallner/users/x_isaak/DockQ/DockQ.py", file, native_file], stdout = output_file)
     output_file.close()
 
@@ -83,7 +83,7 @@ def save_result(output_path, result_file, file):
 
 
 def main():
-    result_file = open("/proj/wallner/users/x_karst/exjobb/evaluate_scoring_matrix/pro_pep/dock_q.txt", "w")
+    result_file = open("/proj/wallner/users/x_karst/exjobb/evaluate_scoring_matrix/pro_pep/dockq_results.txt", "w")
     result_file.write("<MODEL>          <DockQ RESULT>"+'\n')
 
     list_of_files = find_files() #list of model files
@@ -95,7 +95,7 @@ def main():
 
 
 
-
+    result_file.close()
 
 
 

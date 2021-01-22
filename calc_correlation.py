@@ -11,9 +11,10 @@ import seaborn as sns
 
 
 def calc_mean(data_1, data_2):
+    print(data_1, data_2)
 
-    if "pro" in data_1 or data_2: #works for pro vs pep and pro vs whole database
-        print("whole database vs protein protein")
+    if ("glaser" not in data_1) and ("glaser" not in data_2): #works for pro vs pep and pro vs whole database
+        print("whole database vs true protein protein")
         df_1 = pd.read_csv(data_1)
         df_2 = pd.read_csv(data_2)
 
@@ -44,12 +45,15 @@ def calc_mean(data_1, data_2):
 
 
     else: #comparing glaser and my results with the whole database
+        print("comparing glaser with something...")
 
         df_1 = pd.read_csv(data_1) #my first results
         df_2 = pd.read_csv(data_2)
 
-        del df_1['Unnamed: 0'] #removing letters
-        del df_2['Unnamed: 0']
+        if "glaser" in data_1:
+            del df_1['Unnamed: 0'] #removing letters
+        if "glaser" in data_2:
+            del df_2['Unnamed: 0']
 
         print(df_1)
         print(df_2)

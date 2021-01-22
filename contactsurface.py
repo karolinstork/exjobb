@@ -74,7 +74,6 @@ def create_path_chain(file_path, chain_id, curr_model):
 
 
 def rename_chains(file_path):
-
     print(file_path[-9:] + "-----------------------------------")
     file = open(file_path, 'r')
     s = pd.Series(file)
@@ -305,9 +304,6 @@ def run_naccess(result_naccess_file, file_path):
 
 
     list_of_files=os.listdir("/proj/wallner/users/x_karst/exjobb/files_for_naccess/"+dir)
-
-
-
     combination_of_files= itertools.combinations(list_of_files, 2)
     combinations_list = list(combination_of_files)
     print("Doing binary comparisons . . . ")

@@ -34,7 +34,7 @@ def find_pdbfiles(dir_name):
 
 
 def count_models_chains(file):
-    pdb_id=file[-8:]
+    pdb_id=file[-8:] #temp name
     parser=Bio.PDB.PDBParser(PERMISSIVE=1)
     structure = parser.get_structure(pdb_id, file)
 
@@ -73,7 +73,7 @@ def convert_to_fasta(pdb_file, fasta_file, entry_list):
         row_model=row_models[i]
         row_endmdl=row_endmdls[i]
 
-        model=s.truncate(before=row_model+1, after=row_endmdl-1)
+        model=s.truncate(before=row_model, after=row_endmdl)
 
         #Slicing out ATOM records from PDB file
         atoms = model.loc[model.str.startswith(('ATOM'), na=False)] #keep only atom records
@@ -90,6 +90,7 @@ def convert_to_fasta(pdb_file, fasta_file, entry_list):
 
         for chain in chain_dict.keys(): #translate each chain to FASTA
             entry = pdb_file[-9:-5]+chain[:-1] #only write if not already in file
+
             if entry not in entry_list:
                 entry_list.append(entry)
                 fasta_seq=""
@@ -108,7 +109,7 @@ def convert_to_fasta(pdb_file, fasta_file, entry_list):
                     if len(''.join(list_of_residues)) > 6:
                         fasta_seq = ">"+pdb_file[-9:-5]+chain+pdb_file[-5:]+'\n'+ ''.join(list_of_residues)+'\n'
                         print("Converting "+ chain+ " ...")
-                        #print("SUCCESS: File "+pdb_file[-9:-5]+chain+pdb_file[-5:]+" was converted to fasta format")
+
                     else:
                         print("WARNING: Too short sequence! File "+pdb_file[-9:-5]+chain+pdb_file[-5:]+" was removed.")
                         fasta_seq=""
@@ -116,6 +117,7 @@ def convert_to_fasta(pdb_file, fasta_file, entry_list):
                         print("WARNING: Unknown content in sequence. File "+pdb_file[-9:-5]+chain+str(model_numb)+pdb_file[-5:]+" was removed.")
                         fasta_seq=""
                 print(fasta_seq)
+                #fasta_file.write(fasta_seq)
 
 
             else:
@@ -134,26 +136,26 @@ def main():
     list_of_files = find_pdbfiles(dir_name)
 
 
-    fasta_file=open("fasta_file_0506.txt", "w")
+    fasta_file=open("fasta_file_test.txt", "w")
     entry_list = []
-#    x=0
+    x=0
 
     for file in list_of_files:
-        #x = x+1
+        x = x+1
         try:
             numb_models_and_chains = count_models_chains(file)
 
             if numb_models_and_chains != (1,1.0):
                 print("----------------------------------------------------")
                 print(file, "Number of models and chains:" ,numb_models_and_chains)
-                convert_to_fasta(file, fasta_file, entry_list) #måste entry list skickas ut igen eller spars allt i dennu tills nästa varv i loopen? 
+                convert_to_fasta(file, fasta_file, entry_list) #måste entry list skickas ut igen eller spars allt i dennu tills nästa varv i loopen?
 
         except Exception as error:
             print(error)
             print(file)
 
-        #if x == 100 :
-        #    break
+        if x == 20 :
+            break
 
 
 
