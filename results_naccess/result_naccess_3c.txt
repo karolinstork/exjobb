@@ -1,8 +1,0 @@
-43caA1.pdb1	43caB1.pdb1	803.6
-43caG1.pdb4	43caH1.pdb4	803.6
-43caF1.pdb3	43caE1.pdb3	806.9
-43c9E1.pdb3	43c9F1.pdb3	803.6
-43c9C1.pdb2	43c9D1.pdb2	790.05
-43c9A1.pdb1	43c9B1.pdb1	804.45
-43caD1.pdb2	43caC1.pdb2	789.5
-43c9G1.pdb4	43c9H1.pdb4	818.2

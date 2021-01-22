@@ -1,2 +1,0 @@
-12gsA1.pdb1	12gsB1.pdb1	1207.9
-22gsB1.pdb1	22gsA1.pdb1	1179.2

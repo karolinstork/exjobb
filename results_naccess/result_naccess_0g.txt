@@ -1,2 +1,0 @@
-10gsB1.pdb1	10gsA1.pdb1	1184.05
-20gsA1.pdb1	20gsB1.pdb1	1182.65
